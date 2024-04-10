@@ -38,6 +38,7 @@ UsuarioController {
         return ResponseEntity.ok(usuarioRepository.findAll());
     }
 
+    @GetMapping("/validarUsuario")
     public ResponseEntity<Boolean> validarSenha(@RequestParam String login,
                                                 @RequestParam String senha){
         boolean valido = false;
