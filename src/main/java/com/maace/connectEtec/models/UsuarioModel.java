@@ -7,20 +7,19 @@ import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@Entity
-@Table(name="tb_usuario")
-public class UsuarioModel implements Serializable {
+@MappedSuperclass
+public abstract class UsuarioModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idUsuario;
+    protected UUID idUsuario;
     @Column(unique = true)
-    private String login;
-    private String senha;
-    private String nomeCompleto;
-    private String nomeSocial;
+    protected String login;
+    protected String senha;
+    protected String nomeCompleto;
+    protected String nomeSocial;
 
     public UsuarioModel() {
     }
