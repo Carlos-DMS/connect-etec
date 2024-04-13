@@ -7,5 +7,21 @@ import jakarta.persistence.Table;
 @Table(name="tb_funcionario")
 public class FuncionarioModel extends UsuarioModel{
     private String cargo;
-    private enumNivelAcesso nivelAcesso;
+    private EnumNivelAcesso nivelAcesso;
+
+    public String getCargo() {
+        return cargo;
+    }
+
+    public void setCargo(String cargo) {
+        this.cargo = cargo;
+    }
+
+    public EnumNivelAcesso getNivelAcesso() {
+        return nivelAcesso;
+    }
+
+    public void setNivelAcesso(String nivelAcesso) {
+        this.nivelAcesso = EnumNivelAcesso.valueOf(nivelAcesso);
+    }
 }

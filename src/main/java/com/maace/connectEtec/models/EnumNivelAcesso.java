@@ -1,6 +1,6 @@
 package com.maace.connectEtec.models;
 
-public enum enumNivelAcesso {
+public enum EnumNivelAcesso {
 
     BAIXO ("baixo"),
     MEDIO("médio"),
@@ -8,7 +8,7 @@ public enum enumNivelAcesso {
 
     private String enumRelatorio;
 
-    enumNivelAcesso(String enumRelatorio) {
+    EnumNivelAcesso(String enumRelatorio) {
         this.enumRelatorio = enumRelatorio;
     }
 

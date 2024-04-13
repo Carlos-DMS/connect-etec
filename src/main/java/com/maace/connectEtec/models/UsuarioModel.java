@@ -1,5 +1,6 @@
 package com.maace.connectEtec.models;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 
 import java.io.Serial;
@@ -17,6 +18,7 @@ public abstract class UsuarioModel implements Serializable {
     protected UUID idUsuario;
     @Column(unique = true)
     protected String login;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     protected String senha;
     protected String nomeCompleto;
     protected String nomeSocial;

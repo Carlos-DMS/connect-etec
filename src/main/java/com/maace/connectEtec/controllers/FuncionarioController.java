@@ -1,8 +1,11 @@
 package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.AlunoDto;
+import com.maace.connectEtec.dtos.FuncionarioDto;
 import com.maace.connectEtec.models.AlunoModel;
-import com.maace.connectEtec.services.AlunoService;
+import com.maace.connectEtec.models.FuncionarioModel;
+import com.maace.connectEtec.models.UsuarioModel;
+import com.maace.connectEtec.services.FuncionarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -13,26 +16,25 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
 @RestController
-@RequestMapping("/aluno")
-public class AlunoController {
-
+@RequestMapping("/funcionario")
+public class FuncionarioController extends UsuarioModel {
     @Autowired
-    private AlunoService alunoService;
+    private FuncionarioService funcionarioService;
 
     @PostMapping("/salvar")
-    public ResponseEntity<AlunoModel> salvar(@RequestBody @Valid AlunoDto alunoDto){
+    public ResponseEntity<FuncionarioModel> salvar(@RequestBody @Valid FuncionarioDto funcionarioDto){
 
-        AlunoModel usuario = new AlunoModel();
-        BeanUtils.copyProperties(alunoDto, usuario);
-        alunoService.salvar(usuario);
+        FuncionarioModel usuario = new FuncionarioModel();
+        BeanUtils.copyProperties(funcionarioDto, usuario);
+        funcionarioService.salvar(usuario);
 
         return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
     @GetMapping("/listarTodos")
-    public ResponseEntity<List<AlunoModel>> listarTodos(){
+    public ResponseEntity<List<FuncionarioModel>> listarTodos(){
 
-        List<AlunoModel> usuarios = alunoService.listarTodos();
+        List<FuncionarioModel> usuarios = funcionarioService.listarTodos();
 
         return ResponseEntity.status(HttpStatus.OK).body(usuarios);
     }
@@ -40,7 +42,7 @@ public class AlunoController {
     @GetMapping("/validarUsuario")
     public ResponseEntity<Boolean> validarUsuario(@RequestParam String login, @RequestParam String senha){
 
-        boolean valido = alunoService.validarUsuario(login, senha);
+        boolean valido = funcionarioService.validarUsuario(login, senha);
 
         HttpStatus status = (valido) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
 
