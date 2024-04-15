@@ -1,8 +1,6 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.AlunoDto;
 import com.maace.connectEtec.dtos.FuncionarioDto;
-import com.maace.connectEtec.models.AlunoModel;
 import com.maace.connectEtec.models.FuncionarioModel;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.FuncionarioService;
