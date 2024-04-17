@@ -27,7 +27,7 @@ public class UsuarioModel implements Serializable {
     private String nomeSocial;
     private EnumTipoUsuario tipoUsuario;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Integer token;
+    private Integer tokenSecao;
 
     public UsuarioModel() {
     }
@@ -70,6 +70,14 @@ public class UsuarioModel implements Serializable {
 
     public void setTipoUsuario(String tipoUsuario) {
         this.tipoUsuario = EnumTipoUsuario.valueOf(tipoUsuario);
+    }
+
+    public Integer getToken() {
+        return tokenSecao;
+    }
+
+    public void setToken(Integer token) {
+        this.tokenSecao = token;
     }
 
     @Override
