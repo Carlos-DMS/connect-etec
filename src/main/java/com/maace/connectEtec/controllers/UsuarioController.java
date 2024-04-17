@@ -1,45 +1,61 @@
 package com.maace.connectEtec.controllers;
 
+import com.maace.connectEtec.dtos.UsuarioDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
+import org.springframework.beans.BeanUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-public abstract class UsuarioController<T extends UsuarioModel, D> {
+@RestController
+@RequestMapping("/usuario")
+public class UsuarioController {
 
-    private final UsuarioService<T> service;
-
-    protected UsuarioController(UsuarioService<T> service) {
-        this.service = service;
-    }
+    @Autowired
+    private UsuarioService service;
 
     @PostMapping("/salvar")
-    public ResponseEntity<T> salvar(@RequestBody @Valid D dto) {
-        T entity = convertDtoToEntity(dto);
-        service.salvar(entity);
-        return ResponseEntity.status(HttpStatus.CREATED).body(entity);
+    public ResponseEntity<UsuarioModel> salvar(@RequestBody @Valid UsuarioDto usuarioDto){
+
+        UsuarioModel usuario = new UsuarioModel();
+        BeanUtils.copyProperties(usuarioDto, usuario);
+        service.salvar(usuario);
+
+        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
     }
 
     @GetMapping("/listarTodos")
-    public ResponseEntity<List<T>> listarTodos() {
-        List<T> entities = service.listarTodos();
-        return ResponseEntity.status(HttpStatus.OK).body(entities);
+    public ResponseEntity<List<UsuarioModel>> listarTodos(){
+
+        List<UsuarioModel> usuarios = service.listarTodos();
+
+        return ResponseEntity.status(HttpStatus.OK).body(usuarios);
     }
 
-    @GetMapping("/validarUsuario")
-    public ResponseEntity<Boolean> validarUsuario(@RequestParam String login, @RequestParam String senha) {
-        boolean valido = service.validarUsuario(login, senha);
-        HttpStatus status = valido ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+    @GetMapping("/loginUsuario")
+    public ResponseEntity<Boolean> loginUsuario(@RequestParam String login, @RequestParam String senha){
+
+        boolean valido = service.loginUsuario(login, senha);
+
+        HttpStatus status = (valido) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+
         return ResponseEntity.status(status).body(valido);
     }
 
-    protected abstract T convertDtoToEntity(D dto);
-}
+    @GetMapping("/validarUsuario")
+    public ResponseEntity<UsuarioModel> validarUsuario(@RequestParam String login, @RequestParam Integer token) {
+        UsuarioModel usuario = service.validarUsuario(login, token);
 
+        if (usuario == null){
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.OK).body(usuario);
+        }
+    }
+}
