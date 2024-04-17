@@ -9,6 +9,5 @@ public record UsuarioDto(
         @NotBlank String senha,
         @NotBlank String nomeCompleto,
         @NullableNotBlank String nomeSocial,
-        @NotBlank String curso,
         @NotBlank String tipoUsuario
 ) {}
