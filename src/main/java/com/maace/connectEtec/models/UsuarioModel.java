@@ -29,6 +29,10 @@ public class UsuarioModel implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer tokenSecao;
 
+    public UUID getIdUsuario() {
+        return idUsuario;
+    }
+
     public UsuarioModel() {
     }
 
