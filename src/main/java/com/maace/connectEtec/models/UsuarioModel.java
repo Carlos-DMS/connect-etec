@@ -2,26 +2,32 @@ package com.maace.connectEtec.models;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
+import jakarta.validation.constraints.Email;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.UUID;
 
-@MappedSuperclass
-public abstract class UsuarioModel implements Serializable {
+@Entity
+@Table(name = "tb_usuario")
+public class UsuarioModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    protected UUID idUsuario;
+    private UUID idUsuario;
+    @Email
     @Column(unique = true)
-    protected String login;
+    private String login;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    protected String senha;
-    protected String nomeCompleto;
-    protected String nomeSocial;
+    private String senha;
+    private String nomeCompleto;
+    private String nomeSocial;
+    private EnumTipoUsuario tipoUsuario;
+    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
+    private Integer token;
 
     public UsuarioModel() {
     }
@@ -56,6 +62,14 @@ public abstract class UsuarioModel implements Serializable {
 
     public void setNomeSocial(String nomeSocial) {
         this.nomeSocial = nomeSocial;
+    }
+
+    public EnumTipoUsuario getTipoUsuario() {
+        return tipoUsuario;
+    }
+
+    public void setTipoUsuario(String tipoUsuario) {
+        this.tipoUsuario = EnumTipoUsuario.valueOf(tipoUsuario);
     }
 
     @Override
