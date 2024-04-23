@@ -17,8 +17,22 @@ public class GrupoModel implements Serializable {
     private UUID idGrupo;
     @Column(unique = true)
     private String nome;
+    @ManyToOne
+    @JoinColumn(name = "dono_id")
     private UsuarioModel dono;
+    @ManyToMany
+    @JoinTable(
+            name = "tb_grupo_usuario",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
     private List<UsuarioModel> usuarios;
+    @ManyToMany
+    @JoinTable(
+            name = "tb_grupo_administrador",
+            joinColumns = @JoinColumn(name = "grupo_id"),
+            inverseJoinColumns = @JoinColumn(name = "usuario_id")
+    )
     private List<UsuarioModel> administradores;
 
     public UUID getIdGrupo() {
@@ -46,7 +60,7 @@ public class GrupoModel implements Serializable {
     }
 
     public void addUsuario(UsuarioModel usuario) {
-        this.usuarios = usuarios;
+        this.usuarios.add(usuario);
     }
 
     public List<UsuarioModel> getAdministradores() {

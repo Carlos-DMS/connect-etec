@@ -26,7 +26,7 @@ public class UsuarioController {
         BeanUtils.copyProperties(usuarioDto, usuario);
         service.salvar(usuario);
 
-        return ResponseEntity.status(HttpStatus.CREATED).body(usuario);
+        return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/listarTodos")

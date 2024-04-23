@@ -16,5 +16,6 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .build();
+        //30:00 ensinando a utilizar permissões especificas para cada endpoint.
     }
 }
