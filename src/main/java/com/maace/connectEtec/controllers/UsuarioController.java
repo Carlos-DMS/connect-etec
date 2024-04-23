@@ -37,25 +37,25 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.OK).body(usuarios);
     }
 
-    @GetMapping("/loginUsuario")
-    public ResponseEntity<Boolean> loginUsuario(@RequestParam String login, @RequestParam String senha){
-
-        boolean valido = service.loginUsuario(login, senha);
-
-        HttpStatus status = (valido) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
-
-        return ResponseEntity.status(status).body(valido);
-    }
-
-    @GetMapping("/validarUsuario")
-    public ResponseEntity<UsuarioModel> validarUsuario(@RequestParam String login, @RequestParam Integer token) {
-        UsuarioModel usuario = service.validarUsuario(login, token);
-
-        if (usuario == null){
-            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-        }
-        else {
-            return ResponseEntity.status(HttpStatus.OK).body(usuario);
-        }
-    }
+//    @GetMapping("/loginUsuario")
+//    public ResponseEntity<Boolean> loginUsuario(@RequestParam String login, @RequestParam String senha){
+//
+//        boolean valido = service.loginUsuario(login, senha);
+//
+//        HttpStatus status = (valido) ? HttpStatus.OK : HttpStatus.UNAUTHORIZED;
+//
+//        return ResponseEntity.status(status).body(valido);
+//    }
+//
+//    @GetMapping("/validarUsuario")
+//    public ResponseEntity<UsuarioModel> validarUsuario(@RequestParam String login, @RequestParam Integer token) {
+//        UsuarioModel usuario = service.validarUsuario(login, token);
+//
+//        if (usuario == null){
+//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
+//        }
+//        else {
+//            return ResponseEntity.status(HttpStatus.OK).body(usuario);
+//        }
+//    }
 }

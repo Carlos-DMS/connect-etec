@@ -3,15 +3,20 @@ package com.maace.connectEtec.models;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.UserDetails;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 import java.util.UUID;
 
 @Entity
 @Table(name = "tb_usuario")
-public class UsuarioModel implements Serializable {
+public class UsuarioModel implements Serializable, UserDetails {
     @Serial
     private static final long serialVersionUID = 1L;
 
@@ -26,14 +31,9 @@ public class UsuarioModel implements Serializable {
     private String nomeCompleto;
     private String nomeSocial;
     private EnumTipoUsuario tipoUsuario;
-    @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Integer tokenSecao;
 
     public UUID getIdUsuario() {
         return idUsuario;
-    }
-
-    public UsuarioModel() {
     }
 
     public String getLogin() {
@@ -76,14 +76,6 @@ public class UsuarioModel implements Serializable {
         this.tipoUsuario = EnumTipoUsuario.valueOf(tipoUsuario);
     }
 
-    public Integer getToken() {
-        return tokenSecao;
-    }
-
-    public void setToken(Integer token) {
-        this.tokenSecao = token;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -95,5 +87,48 @@ public class UsuarioModel implements Serializable {
     @Override
     public int hashCode() {
         return Objects.hashCode(idUsuario);
+    }
+
+    @Override
+    public Collection<? extends GrantedAuthority> getAuthorities() {
+        if (tipoUsuario == EnumTipoUsuario.USUARIO) {
+            return List.of(new SimpleGrantedAuthority("ROLE_USER"));
+        }
+        else if (tipoUsuario == EnumTipoUsuario.ADMINISTRADOR) {
+            return  List.of(new SimpleGrantedAuthority("ROLE_USER"), new SimpleGrantedAuthority("ROLE_ADMIN"));
+        }
+        else{
+            throw new RuntimeException("Tipo de usúario inexistente");
+        }
+    }
+
+    @Override
+    public String getPassword() {
+        return senha;
+    }
+
+    @Override
+    public String getUsername() {
+        return login;
+    }
+
+    @Override
+    public boolean isAccountNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isAccountNonLocked() {
+        return true;
+    }
+
+    @Override
+    public boolean isCredentialsNonExpired() {
+        return true;
+    }
+
+    @Override
+    public boolean isEnabled() {
+        return true;
     }
 }

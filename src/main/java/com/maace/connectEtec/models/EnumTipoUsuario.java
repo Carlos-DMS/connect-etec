@@ -1,14 +1,16 @@
 package com.maace.connectEtec.models;
 
 public enum EnumTipoUsuario {
-    ALUNO("aluno"),
-    FUNCIONARIO("funcionário"),
-    PROFESSOR("professor"),
-    CORPO_DOCENTE("corpo docente");
+    USUARIO("usuário"),
+    ADMINISTRADOR("administrador");
 
-    private final String enumRelatorio;
+    private final String role;
 
-    EnumTipoUsuario(String enumRelatorio) {
-        this.enumRelatorio = enumRelatorio;
+    EnumTipoUsuario(String role) {
+        this.role = role;
+    }
+
+    public String getRole() {
+        return role;
     }
 }
