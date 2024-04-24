@@ -2,7 +2,9 @@ package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.LoginUsuarioDto;
 import com.maace.connectEtec.dtos.CadastroUsuarioDto;
+import com.maace.connectEtec.dtos.RespostaUsuarioDto;
 import com.maace.connectEtec.models.UsuarioModel;
+import com.maace.connectEtec.security.TokenService;
 import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -25,17 +27,20 @@ public class UsuarioController {
     @Autowired
     private AuthenticationManager authenticationManager;
 
+    @Autowired
+    private TokenService tokenService;
+
     @PostMapping("/cadastrar")
     public ResponseEntity salvar(@RequestBody @Valid CadastroUsuarioDto cadastroUsuarioDto){
         if(service.loadUserByUsername(cadastroUsuarioDto.login()) == null) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            UsuarioModel usuario = new UsuarioModel();
+            BeanUtils.copyProperties(cadastroUsuarioDto, usuario);
+            service.cadastrar(usuario);
+
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
 
-        UsuarioModel usuario = new UsuarioModel();
-        BeanUtils.copyProperties(cadastroUsuarioDto, usuario);
-        service.cadastrar(usuario);
-
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @PostMapping("/login")
@@ -43,13 +48,14 @@ public class UsuarioController {
         var emailSenha = new UsernamePasswordAuthenticationToken(loginUsuarioDto.login(), loginUsuarioDto.senha());
         var auth = this.authenticationManager.authenticate(emailSenha);
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        var token = tokenService.gerarToken((UsuarioModel) auth.getPrincipal());
+        return ResponseEntity.status(HttpStatus.OK).body(token);
     }
 
     @GetMapping("/listarTodos")
-    public ResponseEntity<List<UsuarioModel>> listarTodos(){
+    public ResponseEntity<List<RespostaUsuarioDto>> listarTodos(){
 
-        List<UsuarioModel> usuarios = service.listarTodos();
+        List<RespostaUsuarioDto> usuarios = service.listarTodos();
 
         return ResponseEntity.status(HttpStatus.OK).body(usuarios);
     }

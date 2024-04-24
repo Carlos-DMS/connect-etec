@@ -1,4 +1,9 @@
 package com.maace.connectEtec.dtos;
 
-public record LoginUsuarioDto(String login, String senha) {
-}
+import jakarta.validation.constraints.NotBlank;
+
+public record LoginUsuarioDto(
+        @NotBlank String login,
+        @NotBlank String senha
+)
+{}

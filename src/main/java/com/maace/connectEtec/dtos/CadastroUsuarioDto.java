@@ -10,4 +10,5 @@ public record CadastroUsuarioDto(
         @NotBlank String nomeCompleto,
         @NullableNotBlank String nomeSocial,
         @NotBlank String tipoUsuario
-) {}
+)
+{}
