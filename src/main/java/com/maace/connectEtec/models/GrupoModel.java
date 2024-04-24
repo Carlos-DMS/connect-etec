@@ -18,7 +18,7 @@ public class GrupoModel implements Serializable {
     @Column(unique = true)
     private String nome;
     @ManyToOne
-    @JoinColumn(name = "dono_id")
+    @JoinColumn(name = "idDono")
     private UsuarioModel dono;
     @ManyToMany
     @JoinTable(
