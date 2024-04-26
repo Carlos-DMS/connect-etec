@@ -3,6 +3,7 @@ package com.maace.connectEtec.controllers;
 import com.maace.connectEtec.dtos.LoginUsuarioDto;
 import com.maace.connectEtec.dtos.CadastroUsuarioDto;
 import com.maace.connectEtec.dtos.RespostaUsuarioDto;
+import com.maace.connectEtec.dtos.ValidarUsuarioDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.security.TokenService;
 import com.maace.connectEtec.services.UsuarioService;
@@ -44,7 +45,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/login")
-    public ResponseEntity login(@RequestBody @Valid LoginUsuarioDto loginUsuarioDto) {
+    public ResponseEntity<String> login(@RequestBody @Valid LoginUsuarioDto loginUsuarioDto) {
         var emailSenha = new UsernamePasswordAuthenticationToken(loginUsuarioDto.login(), loginUsuarioDto.senha());
         var auth = this.authenticationManager.authenticate(emailSenha);
 
@@ -60,16 +61,12 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.OK).body(usuarios);
     }
 
-
-//    @GetMapping("/validarUsuario")
-//    public ResponseEntity<UsuarioModel> validarUsuario(@RequestParam String login, @RequestParam Integer token) {
-//        UsuarioModel usuario = service.validarUsuario(login, token);
-//
-//        if (usuario == null){
-//            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body(null);
-//        }
-//        else {
-//            return ResponseEntity.status(HttpStatus.OK).body(usuario);
-//        }
-//    }
+    @GetMapping("/validarUsuario")
+    public ResponseEntity<ValidarUsuarioDto> validarUsuario(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = service.buscarPorToken(authorizationHeader);
+        if (usuario != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(new ValidarUsuarioDto(usuario.getNomeCompleto(), usuario.getNomeSocial(),usuario.getTipoUsuario()));
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 }

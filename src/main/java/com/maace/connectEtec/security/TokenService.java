@@ -20,13 +20,13 @@ public class TokenService {
     public String gerarToken (UsuarioModel usuario) {
         try {
             Algorithm algorithm = Algorithm.HMAC256(secret);
-            String token = JWT.create()
+
+            return JWT.create()
                     .withIssuer("connect-etec")
                     .withSubject(usuario.getLogin())
                     .withExpiresAt(genDataDeExpiracao())
                     .sign(algorithm);
 
-            return token;
         } catch (JWTCreationException exception){
             throw new RuntimeException("Erro durante a criação do token", exception);
         }
@@ -42,7 +42,7 @@ public class TokenService {
                     .getSubject();
         }
         catch (JWTVerificationException exception) {
-            return "";
+            return null;
         }
     }
 
