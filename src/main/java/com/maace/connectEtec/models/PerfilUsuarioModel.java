@@ -8,9 +8,12 @@ import java.util.List;
 @Entity
 @Table(name = "tb_perfil_usuario")
 public class PerfilUsuarioModel extends PerfilModel{
-    @ManyToOne
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID idPerfilUsuario;
+    @OneToOne
     @JoinColumn(name = "idUsuario")
-    private UsuarioModel usuario;
+    private UsuarioModel idUsuario;
     @ManyToMany
     @JoinTable(
             name = "tb_perfil_usuario_conexoes",
@@ -18,8 +21,11 @@ public class PerfilUsuarioModel extends PerfilModel{
             inverseJoinColumns = @JoinColumn(name = "usuario_id")
     )
     private List<UsuarioModel> conexoes;
-
-    @ManyToMany(mappedBy = "perfis")
+    @ManyToMany
+    @JoinTable(
+            name = "tb_perfil_usuario_grupos",
+            joinColumns = @JoinColumn(name = "perfil_usuario_id"),
+            inverseJoinColumns = @JoinColumn(name = "grupo_id")
     private List<GrupoModel> grupos;
 
     public UsuarioModel getUsuario() {

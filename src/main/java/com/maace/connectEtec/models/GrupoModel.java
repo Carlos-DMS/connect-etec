@@ -20,6 +20,13 @@ public class GrupoModel implements Serializable {
     private UsuarioModel dono;
     private List<UsuarioModel> usuarios;
     private List<UsuarioModel> administradores;
+    @ManyToMany(mappedBy = "grupos")
+    private List<PerfilUsuarioModel> perfis;
+
+    @ManyToMany
+
+    @OneToMany(mappedBy = "idGrupo")
+    private List<PostModel> posts
 
     public UUID getIdGrupo() {
         return idGrupo;

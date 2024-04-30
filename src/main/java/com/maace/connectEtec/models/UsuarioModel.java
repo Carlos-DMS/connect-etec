@@ -29,6 +29,17 @@ public class UsuarioModel implements Serializable {
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
     private Integer tokenSecao;
 
+    @ManyToMany(mappedBy = "conexoes")
+    private List<PerfilUsuarioModel> conexao
+
+    @OneToOne(mappedby = "idUsuario")
+    private PerfilUsuarioModel perfilUsuario
+
+    @OneToMany(mappedBy = "idUsuario")
+    private List<PublicacaoModel> publicacoes
+
+
+
     public UUID getIdUsuario() {
         return idUsuario;
     }

@@ -9,13 +9,7 @@ import java.util.List;
 @Table(name = "tb_comentario")
 public class ComentarioModel extends PublicacaoModel{
     protected Integer qtdLike;
-    @OneToMany  // Caso dê erro neste quesito, mappedby é o problema mais provavel
-    @JoinTable(
-            name = "tb_publicacao_usuario",
-            joinColumns = @JoinColumn(name = "idPublicacao"),
-            inverseJoinColumns = @JoinColumn(name = "idPublicacao")
-    )
-    protected List<ComentarioModel> respostas;
+
 
     public Integer getQtdLike() {
         return qtdLike;

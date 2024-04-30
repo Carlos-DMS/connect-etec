@@ -13,16 +13,14 @@ import java.util.List;
 public abstract class PerfilModel implements Serializable {
     @Serial
     protected static final long serialVersionUID = 1L;
+    @Id
+    @GeneratedValue(strategy = GenerationType.AUTO)
+    private UUID idPerfil;
 
     protected String urlFotoPerfil;
     protected String urlBanner;
     protected String sobre;
-    @OneToMany
-    @JoinTable(
-            name = "tb_publicacao_usuario",
-            joinColumns = @JoinColumn(name = "idPublicacao"),
-            inverseJoinColumns = @JoinColumn(name = "idPublicacao")
-    )
+    @OneToMany(mappedBy = "idPerfil")
     protected List<PostModel> posts;
 
     public String getUrlFotoPerfil() {

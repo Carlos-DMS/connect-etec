@@ -16,8 +16,8 @@ public abstract class PublicacaoModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected UUID idPublicacao;
     @ManyToOne
-    @JoinColumn(name = "idAutor")
-    protected UsuarioModel autor;
+    @JoinColumn(name = "idUsuario")
+    protected UsuarioModel idUsuario;
     protected String urlMidia;
     protected static Integer limiteCaracter = 2000;
     protected LocalDateTime momentoPublicacao = LocalDateTime.now();
