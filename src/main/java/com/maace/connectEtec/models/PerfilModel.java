@@ -1,27 +1,24 @@
 package com.maace.connectEtec.models;
 
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.JoinTable;
-import jakarta.persistence.MappedSuperclass;
-import jakarta.persistence.OneToMany;
+import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
+import java.util.UUID;
 
 @MappedSuperclass
 public abstract class PerfilModel implements Serializable {
     @Serial
-    protected static final long serialVersionUID = 1L;
+    private static final long serialVersionUID = 1L;
+
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idPerfil;
-
+    protected UUID idPerfil;
     protected String urlFotoPerfil;
     protected String urlBanner;
     protected String sobre;
-    @OneToMany(mappedBy = "idPerfil")
-    protected List<PostModel> posts;
+    protected List<UUID> idPosts;
 
     public String getUrlFotoPerfil() {
         return urlFotoPerfil;
@@ -47,11 +44,8 @@ public abstract class PerfilModel implements Serializable {
         this.sobre = sobre;
     }
 
-    public List<PostModel> getPosts() {
-        return posts;
+    public List<UUID> getIdPosts() {
+        return idPosts;
     }
 
-    public void setPosts(List<PostModel> posts) {
-        this.posts = posts;
-    }
 }

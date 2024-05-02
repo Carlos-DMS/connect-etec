@@ -17,16 +17,9 @@ public class GrupoModel implements Serializable {
     private UUID idGrupo;
     @Column(unique = true)
     private String nome;
-    private UsuarioModel dono;
-    private List<UsuarioModel> usuarios;
-    private List<UsuarioModel> administradores;
-    @ManyToMany(mappedBy = "grupos")
-    private List<PerfilUsuarioModel> perfis;
-
-    @ManyToMany
-
-    @OneToMany(mappedBy = "idGrupo")
-    private List<PostModel> posts
+    private String loginDono;
+    private List<String> loginUsuarios;
+    private List<String> loginAdmins;
 
     public UUID getIdGrupo() {
         return idGrupo;
@@ -40,27 +33,19 @@ public class GrupoModel implements Serializable {
         this.nome = nome;
     }
 
-    public UsuarioModel getDono() {
-        return dono;
+    public String getLoginDono() {
+        return loginDono;
     }
 
-    public void setDono(UsuarioModel dono) {
-        this.dono = dono;
+    public void setLoginDono(String loginDono) {
+        this.loginDono = loginDono;
     }
 
-    public List<UsuarioModel> getUsuarios() {
-        return usuarios;
+    public List<String> getLoginUsuarios() {
+        return loginUsuarios;
     }
 
-    public void addUsuario(UsuarioModel usuario) {
-        this.usuarios = usuarios;
-    }
-
-    public List<UsuarioModel> getAdministradores() {
-        return administradores;
-    }
-
-    public void setAdministradores(List<UsuarioModel> administradores) {
-        this.administradores = administradores;
+    public List<String> getLoginAdmins() {
+        return loginAdmins;
     }
 }

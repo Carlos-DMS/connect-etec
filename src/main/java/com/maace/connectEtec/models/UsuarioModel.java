@@ -7,7 +7,6 @@ import jakarta.validation.constraints.Email;
 import java.io.Serial;
 import java.io.Serializable;
 import java.util.Objects;
-import java.util.UUID;
 
 @Entity
 @Table(name = "tb_usuario")
@@ -16,8 +15,6 @@ public class UsuarioModel implements Serializable {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idUsuario;
     @Email
     @Column(unique = true)
     private String login;
@@ -27,25 +24,7 @@ public class UsuarioModel implements Serializable {
     private String nomeSocial;
     private EnumTipoUsuario tipoUsuario;
     @JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-    private Integer tokenSecao;
 
-    @ManyToMany(mappedBy = "conexoes")
-    private List<PerfilUsuarioModel> conexao
-
-    @OneToOne(mappedby = "idUsuario")
-    private PerfilUsuarioModel perfilUsuario
-
-    @OneToMany(mappedBy = "idUsuario")
-    private List<PublicacaoModel> publicacoes
-
-
-
-    public UUID getIdUsuario() {
-        return idUsuario;
-    }
-
-    public UsuarioModel() {
-    }
 
     public String getLogin() {
         return login;
@@ -87,24 +66,16 @@ public class UsuarioModel implements Serializable {
         this.tipoUsuario = EnumTipoUsuario.valueOf(tipoUsuario);
     }
 
-    public Integer getToken() {
-        return tokenSecao;
-    }
-
-    public void setToken(Integer token) {
-        this.tokenSecao = token;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         UsuarioModel that = (UsuarioModel) o;
-        return Objects.equals(idUsuario, that.idUsuario);
+        return Objects.equals(login, that.login);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hashCode(idUsuario);
+        return Objects.hashCode(login);
     }
 }
