@@ -6,8 +6,9 @@ import java.io.Serial;
 import java.io.Serializable;
 import java.util.List;
 import java.util.UUID;
+
 @Entity
-@Table(name="tb_grupo")
+@Table(name = "tb_grupo")
 public class GrupoModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -17,9 +18,21 @@ public class GrupoModel implements Serializable {
     private UUID idGrupo;
     @Column(unique = true)
     private String nome;
-    private String loginDono;
-    private List<String> loginUsuarios;
-    private List<String> loginAdmins;
+    @ManyToOne
+    @JoinColumn(name = "idDono")
+    private UsuarioModel dono;
+    @ManyToMany
+    @JoinTable(
+        name = "tb_grupo_usuario", 
+        joinColumns = @JoinColumn(name = "grupo_id"), 
+        inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+    private List<UsuarioModel> usuarios;
+    @ManyToMany
+    @JoinTable(
+        name = "tb_grupo_administrador", 
+        joinColumns = @JoinColumn(name = "grupo_id"), 
+        inverseJoinColumns = @JoinColumn(name = "usuario_id"))
+    private List<UsuarioModel> administradores;
 
     public UUID getIdGrupo() {
         return idGrupo;
@@ -33,19 +46,27 @@ public class GrupoModel implements Serializable {
         this.nome = nome;
     }
 
-    public String getLoginDono() {
-        return loginDono;
+    public UsuarioModel getLoginDono() {
+        return dono;
     }
 
-    public void setLoginDono(String loginDono) {
-        this.loginDono = loginDono;
+    public void setLoginDono(UsuarioModel dono) {
+        this.dono = dono;
     }
 
-    public List<String> getLoginUsuarios() {
-        return loginUsuarios;
+    public List<UsuarioModel> getLoginUsuarios() {
+        return usuarios;
     }
 
-    public List<String> getLoginAdmins() {
-        return loginAdmins;
+    public void addUsuario(UsuarioModel usuario) {
+        this.usuarios.add(usuario);
+    }
+
+    public List<UsuarioModel> getAdministradores() {
+        return administradores;
+    }
+
+    public void setAdministradores(List<UsuarioModel> administradores) {
+        this.administradores = administradores;
     }
 }
