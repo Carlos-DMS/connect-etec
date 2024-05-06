@@ -18,21 +18,9 @@ public class GrupoModel implements Serializable {
     private UUID idGrupo;
     @Column(unique = true)
     private String nome;
-    @ManyToOne
-    @JoinColumn(name = "idDono")
-    private UsuarioModel dono;
-    @ManyToMany
-    @JoinTable(
-        name = "tb_grupo_usuario", 
-        joinColumns = @JoinColumn(name = "grupo_id"), 
-        inverseJoinColumns = @JoinColumn(name = "usuario_id"))
-    private List<UsuarioModel> usuarios;
-    @ManyToMany
-    @JoinTable(
-        name = "tb_grupo_administrador", 
-        joinColumns = @JoinColumn(name = "grupo_id"), 
-        inverseJoinColumns = @JoinColumn(name = "usuario_id"))
-    private List<UsuarioModel> administradores;
+    private String loginDono;
+    private List<String> loginUsuarios;
+    private List<String> loginAdmins;
 
     public UUID getIdGrupo() {
         return idGrupo;
@@ -46,27 +34,19 @@ public class GrupoModel implements Serializable {
         this.nome = nome;
     }
 
-    public UsuarioModel getLoginDono() {
-        return dono;
+    public String getLoginDono() {
+        return loginDono;
     }
 
-    public void setLoginDono(UsuarioModel dono) {
-        this.dono = dono;
+    public void setLoginDono(String loginDono) {
+        this.loginDono = loginDono;
     }
 
-    public List<UsuarioModel> getLoginUsuarios() {
-        return usuarios;
+    public List<String> getLoginUsuarios() {
+        return loginUsuarios;
     }
 
-    public void addUsuario(UsuarioModel usuario) {
-        this.usuarios.add(usuario);
-    }
-
-    public List<UsuarioModel> getAdministradores() {
-        return administradores;
-    }
-
-    public void setAdministradores(List<UsuarioModel> administradores) {
-        this.administradores = administradores;
+    public List<String> getLoginAdmins() {
+        return loginAdmins;
     }
 }

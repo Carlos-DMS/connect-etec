@@ -20,6 +20,10 @@ public abstract class PerfilModel implements Serializable {
     protected String sobre;
     protected List<UUID> idPosts;
 
+    public UUID getIdPerfil() {
+        return idPerfil;
+    }
+
     public String getUrlFotoPerfil() {
         return urlFotoPerfil;
     }

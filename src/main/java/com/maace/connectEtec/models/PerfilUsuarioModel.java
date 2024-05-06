@@ -1,6 +1,5 @@
 package com.maace.connectEtec.models;
 
-
 import jakarta.persistence.*;
 
 import java.util.List;
