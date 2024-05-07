@@ -26,13 +26,13 @@ public class PerfilUsuarioController {
         PerfilUsuarioModel perfilUsuarioModel = new PerfilUsuarioModel();
         BeanUtils.copyProperties(cadastroPerfilUsuarioDto, perfilUsuarioModel);
 
-        service.salvarPerfilUsuario(perfilUsuarioModel);
+        service.criarPerfilUsuario(perfilUsuarioModel);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
     @GetMapping("/listaPerfis")
     public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listaPerfis(){
-        List<Optional<RespostaPerfilUsuarioDto>> perfis = service.listaPerfis();
+        List<Optional<RespostaPerfilUsuarioDto>> perfis = service.listarPerfis();
         if (perfis != null) {
             return ResponseEntity.status(HttpStatus.OK).body(perfis);
         }

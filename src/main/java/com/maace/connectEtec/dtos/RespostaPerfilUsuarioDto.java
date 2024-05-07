@@ -4,6 +4,5 @@ import jakarta.validation.constraints.NotBlank;
 
 public record RespostaPerfilUsuarioDto(
         @NotBlank String nomePerfilUsuario,
-        @NotBlank String urlFotoPerfil,
-        @NotBlank String sobre
+        @NotBlank String urlFotoPerfil
 ) {}

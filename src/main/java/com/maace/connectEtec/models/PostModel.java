@@ -23,7 +23,7 @@ public class PostModel implements Serializable {
     private String conteudo;
     private Integer qtdLike;
     private List<EnumTags> tags;
-    private List<UUID> idRespostas; // Verificar
+    private List<UUID> idRespostas;
     private UUID idGrupo;
 
     public UUID getIdPost() {
