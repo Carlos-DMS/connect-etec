@@ -16,7 +16,6 @@ public abstract class PerfilModel implements Serializable {
     @GeneratedValue(strategy = GenerationType.AUTO)
     protected UUID idPerfil;
     protected String urlFotoPerfil;
-    protected String urlBanner;
     protected String sobre;
     protected List<UUID> idPosts;
 
@@ -30,14 +29,6 @@ public abstract class PerfilModel implements Serializable {
 
     public void setUrlFotoPerfil(String urlFotoPerfil) {
         this.urlFotoPerfil = urlFotoPerfil;
-    }
-
-    public String getUrlBanner() {
-        return urlBanner;
-    }
-
-    public void setUrlBanner(String urlBanner) {
-        this.urlBanner = urlBanner;
     }
 
     public String getSobre() {

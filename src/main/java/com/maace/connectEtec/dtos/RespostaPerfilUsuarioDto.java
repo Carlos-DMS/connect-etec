@@ -8,7 +8,5 @@ import java.util.UUID;
 public record RespostaPerfilUsuarioDto(
         @NotBlank UUID idPerfil,
         @NotBlank String urlFotoPerfil,
-        @NotBlank String urlBanner,
-        @NotBlank String sobre,
-        List<UUID> idGrupos
+        @NotBlank String sobre
 ) {}

@@ -28,9 +28,7 @@ public class PerfilUsuarioService {
             RespostaPerfilUsuarioDto respostaPerfilUsuarioDto = new RespostaPerfilUsuarioDto(
                     perfilUsuario.getIdPerfil(),
                     perfilUsuario.getUrlFotoPerfil(),
-                    perfilUsuario.getUrlBanner(),
-                    perfilUsuario.getSobre(),
-                    perfilUsuario.getGrupos()
+                    perfilUsuario.getSobre()
             );
             perfilUsuariosDto.add(respostaPerfilUsuarioDto);
         }
