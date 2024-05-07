@@ -18,6 +18,7 @@ public class GrupoModel implements Serializable {
     private UUID idGrupo;
     @Column(unique = true)
     private String nome;
+    private UUID idPerfilGrupo;
     private String loginDono;
     private List<String> loginUsuarios;
     private List<String> loginAdmins;
@@ -32,6 +33,14 @@ public class GrupoModel implements Serializable {
 
     public void setNome(String nome) {
         this.nome = nome;
+    }
+
+    public UUID getIdPerfilGrupo() {
+        return idPerfilGrupo;
+    }
+
+    public void setIdPerfilGrupo(UUID idPerfilGrupo) {
+        this.idPerfilGrupo = idPerfilGrupo;
     }
 
     public String getLoginDono() {
