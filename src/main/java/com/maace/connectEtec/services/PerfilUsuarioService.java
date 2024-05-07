@@ -2,45 +2,60 @@ package com.maace.connectEtec.services;
 
 import com.maace.connectEtec.dtos.RespostaPerfilUsuarioDto;
 import com.maace.connectEtec.models.PerfilUsuarioModel;
+import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.repositories.PerfilUsuarioRepository;
+import com.maace.connectEtec.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 @Service
 public class PerfilUsuarioService {
 
     @Autowired
-    PerfilUsuarioRepository repository;
+    PerfilUsuarioRepository perfilUsuarioRepository;
+
+    @Autowired
+    UsuarioRepository usuarioRepository;
 
     public void salvarPerfilUsuario(PerfilUsuarioModel perfilUsuario){
-        repository.save(perfilUsuario);
+        perfilUsuarioRepository.save(perfilUsuario);
     }
 
-    public List<RespostaPerfilUsuarioDto> listarTodos(){
-        List<PerfilUsuarioModel> perfilUsuarios = repository.findAll();
-        List<RespostaPerfilUsuarioDto> perfilUsuariosDto = new ArrayList<>();
+    public List<Optional<RespostaPerfilUsuarioDto>> listaPerfis(){
+        List<UsuarioModel> usuarios = usuarioRepository.findAll();
+        List<Optional<RespostaPerfilUsuarioDto>> perfis = new ArrayList<>();
 
-        for (PerfilUsuarioModel perfilUsuario : perfilUsuarios){
-            RespostaPerfilUsuarioDto respostaPerfilUsuarioDto = new RespostaPerfilUsuarioDto(
-                    perfilUsuario.getIdPerfil(),
-                    perfilUsuario.getUrlFotoPerfil(),
-                    perfilUsuario.getSobre()
-            );
-            perfilUsuariosDto.add(respostaPerfilUsuarioDto);
+        String nome;
+
+        for (UsuarioModel usuario : usuarios) {
+            UUID idPerfilUsuario = usuario.getIdPerfilUsuario();
+
+            Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(idPerfilUsuario);
+
+            if (usuario.getNomeSocial() != null) {
+                nome = usuario.getNomeSocial();
+            }
+            else{
+                nome = usuario.getNomeCompleto();
+            }
+
+            perfis.add(Optional.of(new RespostaPerfilUsuarioDto(nome, perfil.get().getUrlFotoPerfil(), perfil.get().getSobre())));
         }
-        return perfilUsuariosDto;
+        return perfis;
     }
 
-    public PerfilUsuarioModel buscarPorId(UUID id){
-        return repository.findById(id).orElse(null);
+    public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario){
+        UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
+
+        UUID idPerfilUsuario = usuario.getIdPerfilUsuario();
+
+        return perfilUsuarioRepository.findById(idPerfilUsuario);
     }
 
-    //REALMENTE NECESSARIO? FAZER UM UPDATE?
-    /*public void deletar(UUID id) {
-        repository.deleteById(id);
-    }*/
+    //REALMENTE NECESSARIO? FAZER UM UPDATE? SIM!
 }

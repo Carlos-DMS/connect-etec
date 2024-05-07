@@ -12,7 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.UUID;
+import java.util.Optional;
 
 @RestController
 @RequestMapping("/perfilUsuario")
@@ -21,7 +21,7 @@ public class PerfilUsuarioController {
     @Autowired
     private PerfilUsuarioService service;
 
-    @PostMapping("salvar")
+    @PostMapping("/salvar")
     public ResponseEntity salvar(@RequestBody @Valid CadastroPerfilUsuarioDto cadastroPerfilUsuarioDto){
         PerfilUsuarioModel perfilUsuarioModel = new PerfilUsuarioModel();
         BeanUtils.copyProperties(cadastroPerfilUsuarioDto, perfilUsuarioModel);
@@ -30,23 +30,24 @@ public class PerfilUsuarioController {
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
 
-    @GetMapping("/listarTodos")
-    public ResponseEntity<List<RespostaPerfilUsuarioDto>> listarTodos(){
-
-        List<RespostaPerfilUsuarioDto> perfilUsuario = service.listarTodos();
-
-        return ResponseEntity.status(HttpStatus.OK).body(perfilUsuario);
+    @GetMapping("/listaPerfis")
+    public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listaPerfis(){
+        List<Optional<RespostaPerfilUsuarioDto>> perfis = service.listaPerfis();
+        if (perfis != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(perfis);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("buscar/{id}")
-    public ResponseEntity buscarPorId(@PathVariable UUID id) {
-        PerfilUsuarioModel perfilUsuario = service.buscarPorId(id);
+    @GetMapping("/buscarPerfil")
+    public ResponseEntity buscarPorId(@RequestBody String login) {
+        Optional<PerfilUsuarioModel> perfilUsuario = service.buscarPerfil(login);
+
         if (perfilUsuario != null) {
             return ResponseEntity.status(HttpStatus.OK).build();
         }
-        //BAD_REQUEST ou NOT_FOUND?
-        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    //fazer delete e update?
+
 }

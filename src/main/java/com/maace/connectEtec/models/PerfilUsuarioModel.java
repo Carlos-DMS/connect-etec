@@ -8,17 +8,8 @@ import java.util.UUID;
 @Entity
 @Table(name = "tb_perfil_usuario")
 public class PerfilUsuarioModel extends PerfilModel{
-    private String loginUsuario;
     private List<String> loginConexoes;
     private List<UUID> idGrupos;
-
-    public String getLoginUsuario() {
-        return loginUsuario;
-    }
-
-    public void setLoginUsuario(String loginUsuario) {
-        this.loginUsuario = loginUsuario;
-    }
 
     public List<String> getLoginConexoes() {
         return loginConexoes;

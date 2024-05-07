@@ -45,7 +45,8 @@ public class UsuarioService implements UserDetailsService {
                     usuario.getLogin(),
                     usuario.getNomeCompleto(),
                     usuario.getNomeSocial(),
-                    usuario.getTipoUsuario().getRole());
+                    usuario.getTipoUsuario().getRole()
+            );
             usuariosDto.add(respostaUsuarioDto);
         }
         return usuariosDto;

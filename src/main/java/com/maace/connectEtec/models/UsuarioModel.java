@@ -21,8 +21,6 @@ public class UsuarioModel implements Serializable, UserDetails {
     private static final long serialVersionUID = 1L;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private UUID idUsuario;
     @Email
     @Column(unique = true)
     private String login;
@@ -30,11 +28,8 @@ public class UsuarioModel implements Serializable, UserDetails {
     private String senha;
     private String nomeCompleto;
     private String nomeSocial;
+    private UUID idPerfilUsuario;
     private EnumTipoUsuario tipoUsuario;
-
-    public UUID getIdUsuario() {
-        return idUsuario;
-    }
 
     public String getLogin() {
         return login;
@@ -66,6 +61,14 @@ public class UsuarioModel implements Serializable, UserDetails {
 
     public void setNomeSocial(String nomeSocial) {
         this.nomeSocial = nomeSocial;
+    }
+
+    public UUID getIdPerfilUsuario() {
+        return idPerfilUsuario;
+    }
+
+    public void setIdPerfilUsuario(UUID idPerfilUsuario) {
+        this.idPerfilUsuario = idPerfilUsuario;
     }
 
     public EnumTipoUsuario getTipoUsuario() {
