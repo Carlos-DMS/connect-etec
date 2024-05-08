@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -68,6 +69,16 @@ public class PostModel implements Serializable {
 
     public List<EnumTags> getTags() {
         return tags;
+    }
+
+    public List<String> getTagsRelatorio() {
+        List<String> tagsRelatorio = new ArrayList<>();
+
+        for (EnumTags tag : tags){
+            tagsRelatorio.add(tag.getTag());
+        }
+
+        return tagsRelatorio;
     }
 
     public List<UUID> getIdRespostas() {
