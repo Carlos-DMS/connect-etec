@@ -22,8 +22,8 @@ public class PostModel implements Serializable {
     private String urlMidia;
     private final LocalDateTime momentoPublicacao = LocalDateTime.now();
     private String conteudo;
-    private Integer qtdLike;
-    private List<EnumTags> tags;
+    private Integer qtdLike = 0;
+    private List<EnumTags> tags = new ArrayList<>();
     private List<UUID> idRespostas;
     private UUID idGrupo;
 
@@ -39,8 +39,8 @@ public class PostModel implements Serializable {
         return loginAutor;
     }
 
-    public void setLoginAutor(UsuarioModel usuario) {
-        this.loginAutor = usuario.getLogin();
+    public void setLoginAutor(String login) {
+        this.loginAutor = login;
     }
 
     public String getUrlMidia() {
@@ -65,6 +65,10 @@ public class PostModel implements Serializable {
 
     public void setQtdLike(Integer qtdLike) {
         this.qtdLike = qtdLike;
+    }
+
+    public void addTag(String tag) {
+        tags.add(EnumTags.valueOf(tag));
     }
 
     public List<EnumTags> getTags() {

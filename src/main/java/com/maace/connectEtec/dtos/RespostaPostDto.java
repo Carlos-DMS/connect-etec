@@ -7,9 +7,9 @@ import java.util.UUID;
 public record RespostaPostDto(
         UUID idPost,
         String nomeAutor,
-        String urlFotoDePerfilUsuario,
+        String urlFotoPerfilUsuario,
         String nomeGrupo,
-        String urlFotoDePerfilGrupo,
+        String urlFotoPerfilGrupo,
         String urlMidia,
         LocalDateTime momentoPublicacao,
         String conteudo,

@@ -1,11 +1,13 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.CadastroPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.AcessarPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.EditarPerfilDto;
 import com.maace.connectEtec.dtos.RespostaPerfilUsuarioDto;
-import com.maace.connectEtec.models.PerfilUsuarioModel;
+import com.maace.connectEtec.dtos.RespostaPostDto;
+import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PerfilUsuarioService;
+import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -19,35 +21,73 @@ import java.util.Optional;
 public class PerfilUsuarioController {
 
     @Autowired
-    private PerfilUsuarioService service;
+    private PerfilUsuarioService perfilUsuarioService;
 
-    @PostMapping("/salvar")
-    public ResponseEntity salvar(@RequestBody @Valid CadastroPerfilUsuarioDto cadastroPerfilUsuarioDto){
-        PerfilUsuarioModel perfilUsuarioModel = new PerfilUsuarioModel();
-        BeanUtils.copyProperties(cadastroPerfilUsuarioDto, perfilUsuarioModel);
+    @Autowired
+    UsuarioService usuarioService;
 
-        service.criarPerfilUsuario(perfilUsuarioModel);
-        return ResponseEntity.status(HttpStatus.CREATED).build();
+    @PutMapping("/editar")
+    public ResponseEntity editar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid EditarPerfilDto editarPerfilDto) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        if(usuario != null) {
+            perfilUsuarioService.editarPerfil(editarPerfilDto, usuario);
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/listaPerfis")
-    public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listaPerfis(){
-        List<Optional<RespostaPerfilUsuarioDto>> perfis = service.listarPerfis();
+    @GetMapping("/listarTodos")
+    public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listarTodos() {
+        List<Optional<RespostaPerfilUsuarioDto>> perfis = perfilUsuarioService.listarPerfis();
+
         if (perfis != null) {
             return ResponseEntity.status(HttpStatus.OK).body(perfis);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
-    @GetMapping("/buscarPerfil")
-    public ResponseEntity buscarPorId(@RequestBody String login) {
-        Optional<PerfilUsuarioModel> perfilUsuario = service.buscarPerfil(login);
+    @GetMapping("/buscarMeuPerfil")
+    public ResponseEntity<AcessarPerfilUsuarioDto> buscarMeuPerfil(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        if (perfilUsuario != null) {
-            return ResponseEntity.status(HttpStatus.OK).build();
+        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(usuario.getLogin());
+
+        if (acessarPerfilUsuarioDto != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
+    @GetMapping("/buscarPerfil")
+    public ResponseEntity<AcessarPerfilUsuarioDto> buscarPerfil(@RequestBody String login) {
+        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(login);
 
+        if (acessarPerfilUsuarioDto != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/buscarMeusPosts")
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarMeusPosts(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(usuario.getLogin());
+
+        if (!posts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(posts);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
+
+    @GetMapping("/buscarPosts")
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestBody String login) {
+        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(login);
+
+        if (!posts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(posts);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 }

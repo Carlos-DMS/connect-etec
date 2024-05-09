@@ -38,7 +38,9 @@ public class UsuarioService implements UserDetailsService {
             String login = tokenService.validarToken(token);
             return repository.findByLogin(login);
         }
-        return null;
+        else {
+            return null;
+        }
     }
 
     private String extrairToken(String authorizationHeader) {

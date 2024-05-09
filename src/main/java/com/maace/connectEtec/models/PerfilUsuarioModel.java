@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,9 +19,12 @@ public class PerfilUsuarioModel implements Serializable {
     private UUID idPerfil;
     private String urlFotoPerfil;
     private String sobre;
-    private List<UUID> idPosts;
-    private List<String> loginConexoes;
-    private List<UUID> idGrupos;
+    @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_posts", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "post_id")
+    private List<UUID> idPosts = new ArrayList<>();
+    private List<String> loginConexoes = new ArrayList<>();
+    private List<UUID> idGrupos = new ArrayList<>();
 
     public UUID getIdPerfil() {
         return idPerfil;
@@ -40,6 +44,10 @@ public class PerfilUsuarioModel implements Serializable {
 
     public void setSobre(String sobre) {
         this.sobre = sobre;
+    }
+
+    public void addIdPost(UUID idPost) {
+        idPosts.add(idPost);
     }
 
     public List<UUID> getIdPosts() {

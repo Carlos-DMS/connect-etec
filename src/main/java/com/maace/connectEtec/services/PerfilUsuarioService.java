@@ -1,9 +1,6 @@
 package com.maace.connectEtec.services;
 
-import com.maace.connectEtec.dtos.AcessarPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.RespostaPerfilGrupoDto;
-import com.maace.connectEtec.dtos.RespostaPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.RespostaPostDto;
+import com.maace.connectEtec.dtos.*;
 import com.maace.connectEtec.models.*;
 import com.maace.connectEtec.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -32,8 +29,21 @@ public class PerfilUsuarioService {
     @Autowired
     PerfilGrupoRepository perfilGrupoRepository;
 
-    public void criarPerfilUsuario(PerfilUsuarioModel perfilUsuario){
+    public void criarPerfilUsuario(PerfilUsuarioModel perfilUsuario) {
         perfilUsuarioRepository.save(perfilUsuario);
+    }
+
+    public void editarPerfil(EditarPerfilDto atualizarPerfilDto, UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfil = buscarPerfil(usuario.getLogin());
+
+        usuario.setNomeCompleto(atualizarPerfilDto.nomeCompleto());
+        usuario.setNomeSocial(atualizarPerfilDto.nomeSocial());
+
+        perfil.get().setUrlFotoPerfil(atualizarPerfilDto.urlFotoPerfil());
+        perfil.get().setSobre(atualizarPerfilDto.sobre());
+
+        usuarioRepository.save(usuario);
+        perfilUsuarioRepository.save(perfil.get());
     }
 
     public List<Optional<RespostaPerfilUsuarioDto>> listarPerfis(){
@@ -45,7 +55,7 @@ public class PerfilUsuarioService {
 
             Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(idPerfilUsuario);
 
-            perfis.add(Optional.of(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil())));
+            perfis.add(Optional.of(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil(), usuario.getLogin())));
         }
         return perfis;
     }
@@ -54,7 +64,16 @@ public class PerfilUsuarioService {
         UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
 
-        return new AcessarPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil(), perfil.get().getSobre());
+        if (usuario != null) {
+            return new AcessarPerfilUsuarioDto(
+                    usuario.getNomeCompleto(),
+                    usuario.getNomeSocial(),
+                    selecionarNomeExibido(usuario),
+                    perfil.get().getUrlFotoPerfil(),
+                    perfil.get().getSobre()
+            );
+        }
+        return null;
     }
 
     public List<Optional<RespostaPostDto>> buscarPosts(String loginUsuario) {
@@ -65,20 +84,24 @@ public class PerfilUsuarioService {
         List<Optional<RespostaPostDto>> posts = new ArrayList<>();
 
         for (UUID idPost : idPosts) {
+            Optional<GrupoModel> grupo = Optional.empty();
+            Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
+
             Optional<PostModel> post = postRepository.findById(idPost);
 
             UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
 
-            Optional<GrupoModel> grupo = grupoRepository.findById(post.get().getIdGrupo());
-
-            Optional<PerfilGrupoModel> perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
-
+            if (post.get().getIdGrupo() != null) {
+                grupo = grupoRepository.findById(post.get().getIdGrupo());
+                perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+            }
+            
             posts.add(Optional.of(new RespostaPostDto(
                     post.get().getIdPost(),
                     selecionarNomeExibido(usuario),
                     perfilUsuario.get().getUrlFotoPerfil(),
-                    grupo.get().getNome(),
-                    perfilGrupo.get().getUrlFotoPerfil(),
+                    (grupo.isPresent()) ? grupo.get().getNome() : null,
+                    (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
                     post.get().getUrlMidia(),
                     post.get().getMomentoPublicacao(),
                     post.get().getConteudo(),
@@ -102,7 +125,7 @@ public class PerfilUsuarioService {
 
                 Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(usuario.getLogin());
 
-                conexoes.add(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil()));
+                conexoes.add(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil(), usuario.getLogin()));
             }
             return conexoes;
         }

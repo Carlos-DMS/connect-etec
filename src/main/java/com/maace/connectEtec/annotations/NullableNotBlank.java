@@ -19,6 +19,3 @@ public @interface NullableNotBlank {
 
     Class<? extends Payload>[] payload() default {};
 }
-
-
-
