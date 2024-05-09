@@ -30,16 +30,13 @@ public class PostService {
         post.setLoginAutor(usuario.getLogin());
         post.setConteudo(criarPostDto.conteudo());
         post.setUrlMidia(criarPostDto.urlMidia());
+        post.setTag(criarPostDto.tag());
 
-        if (criarPostDto.idGrupo() == null) {
-            post.setIdGrupo(null);
-        }
-        else{
+        if (criarPostDto.idGrupo() != null) {
             post.setIdGrupo(UUID.fromString(criarPostDto.idGrupo()));
         }
-
-        for (String tag : criarPostDto.tags()) {
-            post.addTag(tag);
+        else{
+            post.setIdGrupo(null);
         }
 
         postRepository.save(post);

@@ -106,7 +106,7 @@ public class PerfilUsuarioService {
                     post.get().getMomentoPublicacao(),
                     post.get().getConteudo(),
                     post.get().getQtdLike(),
-                    post.get().getTagsRelatorio()
+                    post.get().getTagRelatorio()
             )));
         }
         return posts;
