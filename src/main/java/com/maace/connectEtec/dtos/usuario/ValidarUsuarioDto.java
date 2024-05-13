@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.usuario;
 
 import com.maace.connectEtec.models.EnumTipoUsuario;
 

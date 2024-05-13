@@ -34,10 +34,12 @@ public class UsuarioService implements UserDetailsService {
 
     public UsuarioModel buscarPorToken(String authorizationHeader) {
         String token = extrairToken(authorizationHeader);
+
         if (token != null) {
             String login = tokenService.validarToken(token);
             return repository.findByLogin(login);
         }
+
         return null;
     }
 

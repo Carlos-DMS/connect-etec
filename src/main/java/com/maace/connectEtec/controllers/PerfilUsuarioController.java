@@ -1,7 +1,7 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.CadastroPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.RespostaPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.perfilUsuario.CadastroPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.perfilUsuario.RespostaPerfilUsuarioDto;
 import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.services.PerfilUsuarioService;
 import jakarta.validation.Valid;
@@ -25,7 +25,6 @@ public class PerfilUsuarioController {
     public ResponseEntity salvar(@RequestBody @Valid CadastroPerfilUsuarioDto cadastroPerfilUsuarioDto){
         PerfilUsuarioModel perfilUsuarioModel = new PerfilUsuarioModel();
         BeanUtils.copyProperties(cadastroPerfilUsuarioDto, perfilUsuarioModel);
-
         service.criarPerfilUsuario(perfilUsuarioModel);
         return ResponseEntity.status(HttpStatus.CREATED).build();
     }
@@ -33,21 +32,14 @@ public class PerfilUsuarioController {
     @GetMapping("/listaPerfis")
     public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listaPerfis(){
         List<Optional<RespostaPerfilUsuarioDto>> perfis = service.listarPerfis();
-        if (perfis != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(perfis);
-        }
+        if (perfis != null)  return ResponseEntity.status(HttpStatus.OK).body(perfis);
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 
     @GetMapping("/buscarPerfil")
     public ResponseEntity buscarPorId(@RequestBody String login) {
         Optional<PerfilUsuarioModel> perfilUsuario = service.buscarPerfil(login);
-
-        if (perfilUsuario != null) {
-            return ResponseEntity.status(HttpStatus.OK).build();
-        }
+        if (perfilUsuario.isPresent()) return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
-
-
 }

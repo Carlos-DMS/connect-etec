@@ -1,9 +1,9 @@
 package com.maace.connectEtec.services;
 
-import com.maace.connectEtec.dtos.AcessarPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.RespostaPerfilGrupoDto;
-import com.maace.connectEtec.dtos.RespostaPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.RespostaPostDto;
+import com.maace.connectEtec.dtos.perfilUsuario.AcessarPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.perfilUsuario.RespostaPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.perfilGrupo.RespostaPerfilGrupoDto;
+import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.*;
 import com.maace.connectEtec.repositories.*;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -150,5 +150,5 @@ public class PerfilUsuarioService {
     }
 
 
-    //REALMENTE NECESSARIO FAZER UM UPDATE? SIM!
+    //FAZER UM UPDATE!!!
 }

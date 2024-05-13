@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.perfilUsuario;
 
 public record AcessarPerfilUsuarioDto(
         String nomeUsuario,

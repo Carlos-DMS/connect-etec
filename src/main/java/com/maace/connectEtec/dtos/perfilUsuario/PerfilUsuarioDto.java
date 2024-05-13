@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.perfilUsuario;
 
 import java.util.List;
 import java.util.UUID;

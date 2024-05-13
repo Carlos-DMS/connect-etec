@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.post;
 
 import java.time.LocalDateTime;
 import java.util.List;

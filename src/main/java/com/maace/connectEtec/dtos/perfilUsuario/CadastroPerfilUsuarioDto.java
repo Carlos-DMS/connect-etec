@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.perfilUsuario;
 
 import jakarta.validation.constraints.NotBlank;
 
