@@ -5,7 +5,6 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -22,8 +21,8 @@ public class PostModel implements Serializable {
     private String urlMidia;
     private final LocalDateTime momentoPublicacao = LocalDateTime.now();
     private String conteudo;
-    private Integer qtdLike;
-    private List<EnumTags> tags;
+    private Integer qtdLike = 0;
+    private EnumTag tag;
     private List<UUID> idRespostas;
     private UUID idGrupo;
 
@@ -39,8 +38,8 @@ public class PostModel implements Serializable {
         return loginAutor;
     }
 
-    public void setLoginAutor(UsuarioModel usuario) {
-        this.loginAutor = usuario.getLogin();
+    public void setLoginAutor(String login) {
+        this.loginAutor = login;
     }
 
     public String getUrlMidia() {
@@ -67,18 +66,16 @@ public class PostModel implements Serializable {
         this.qtdLike = qtdLike;
     }
 
-    public List<EnumTags> getTags() {
-        return tags;
+    public void setTag(String tag) {
+        this.tag = EnumTag.valueOf(tag);
     }
 
-    public List<String> getTagsRelatorio() {
-        List<String> tagsRelatorio = new ArrayList<>();
+    public EnumTag getTag() {
+        return tag;
+    }
 
-        for (EnumTags tag : tags){
-            tagsRelatorio.add(tag.getTag());
-        }
-
-        return tagsRelatorio;
+    public String getTagRelatorio() {
+        return tag.getTag();
     }
 
     public List<UUID> getIdRespostas() {

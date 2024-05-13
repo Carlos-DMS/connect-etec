@@ -5,6 +5,7 @@ import com.maace.connectEtec.dtos.usuario.CadastroUsuarioDto;
 import com.maace.connectEtec.dtos.usuario.ValidarUsuarioDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.security.TokenService;
+import com.maace.connectEtec.services.PerfilUsuarioService;
 import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
 import org.springframework.beans.BeanUtils;
@@ -21,7 +22,7 @@ import org.springframework.web.bind.annotation.*;
 public class UsuarioController {
 
     @Autowired
-    private UsuarioService service;
+    private UsuarioService usuarioService;
 
     @Autowired
     private AuthenticationManager authenticationManager;
@@ -29,16 +30,25 @@ public class UsuarioController {
     @Autowired
     private TokenService tokenService;
 
+    @Autowired
+    private PerfilUsuarioService perfilUsuarioService;
+
     @PostMapping("/cadastrar")
     public ResponseEntity salvar(@RequestBody @Valid CadastroUsuarioDto cadastroUsuarioDto) {
-        if (service.loadUserByUsername(cadastroUsuarioDto.login()) == null) {
+        if (usuarioService.loadUserByUsername(cadastroUsuarioDto.login()) == null) {
             UsuarioModel usuario = new UsuarioModel();
+            PerfilUsuarioModel perfil = new PerfilUsuarioModel();
+
             BeanUtils.copyProperties(cadastroUsuarioDto, usuario);
-            service.cadastrar(usuario);
+
+            perfilUsuarioService.criarPerfilUsuario(perfil);
+
+            usuario.setIdPerfilUsuario(perfil.getIdPerfil());
+
+            usuarioService.cadastrar(usuario);
 
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
@@ -52,9 +62,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/validarUsuario")
-    public ResponseEntity<ValidarUsuarioDto> validarUsuario(
-            @RequestHeader("Authorization") String authorizationHeader) {
-        UsuarioModel usuario = service.buscarPorToken(authorizationHeader);
+    public ResponseEntity<ValidarUsuarioDto> validarUsuario(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
         if (usuario != null) {
             return ResponseEntity.status(HttpStatus.OK).body(new ValidarUsuarioDto(usuario.getNomeCompleto(),
                     usuario.getNomeSocial(), usuario.getTipoUsuario()));

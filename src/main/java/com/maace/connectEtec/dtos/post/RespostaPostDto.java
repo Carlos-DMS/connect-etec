@@ -1,18 +1,17 @@
 package com.maace.connectEtec.dtos.post;
 
 import java.time.LocalDateTime;
-import java.util.List;
 import java.util.UUID;
 
 public record RespostaPostDto(
         UUID idPost,
         String nomeAutor,
-        String urlFotoDePerfilUsuario,
+        String urlFotoPerfilUsuario,
         String nomeGrupo,
-        String urlFotoDePerfilGrupo,
+        String urlFotoPerfilGrupo,
         String urlMidia,
         LocalDateTime momentoPublicacao,
         String conteudo,
         Integer qtdLike,
-        List<String> tags
+        String tag
 ) { }
