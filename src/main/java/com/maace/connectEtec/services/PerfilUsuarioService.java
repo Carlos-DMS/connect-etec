@@ -33,16 +33,23 @@ public class PerfilUsuarioService {
         perfilUsuarioRepository.save(perfilUsuario);
     }
 
-    public void editarPerfil(EditarPerfilDto atualizarPerfilDto, UsuarioModel usuario) {
+    public void editarDadosPerfil(EditarPerfilDto atualizarPerfilDto, UsuarioModel usuario) {
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(usuario.getLogin());
 
         usuario.setNomeCompleto(atualizarPerfilDto.nomeCompleto());
         usuario.setNomeSocial(atualizarPerfilDto.nomeSocial());
 
-        perfil.get().setUrlFotoPerfil(atualizarPerfilDto.urlFotoPerfil());
         perfil.get().setSobre(atualizarPerfilDto.sobre());
 
         usuarioRepository.save(usuario);
+        perfilUsuarioRepository.save(perfil.get());
+    }
+
+    public void editarFotoPerfil(EditarFotoPerfilDto fotoDto, UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfil = buscarPerfil(usuario.getLogin());
+
+        perfil.get().setUrlFotoPerfil(fotoDto.urlFotoPerfil());
+
         perfilUsuarioRepository.save(perfil.get());
     }
 
