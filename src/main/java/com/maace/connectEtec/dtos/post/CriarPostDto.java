@@ -1,4 +1,4 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.post;
 
 import com.maace.connectEtec.annotations.NullableNotBlank;
 import jakarta.validation.constraints.NotNull;

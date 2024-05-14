@@ -1,6 +1,6 @@
 package com.maace.connectEtec.services;
 
-import com.maace.connectEtec.dtos.CriarPostDto;
+import com.maace.connectEtec.dtos.post.CriarPostDto;
 import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.models.PostModel;
 import com.maace.connectEtec.models.UsuarioModel;

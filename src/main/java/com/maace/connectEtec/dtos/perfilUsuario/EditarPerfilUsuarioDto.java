@@ -1,9 +1,9 @@
-package com.maace.connectEtec.dtos;
+package com.maace.connectEtec.dtos.perfilUsuario;
 
 import com.maace.connectEtec.annotations.NullableNotBlank;
 import jakarta.validation.constraints.NotBlank;
 
-public record EditarPerfilDto(
+public record EditarPerfilUsuarioDto(
         @NotBlank String nomeCompleto,
         @NullableNotBlank String nomeSocial,
         @NullableNotBlank String urlFotoPerfil,

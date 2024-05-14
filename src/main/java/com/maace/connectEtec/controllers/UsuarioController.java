@@ -3,6 +3,7 @@ package com.maace.connectEtec.controllers;
 import com.maace.connectEtec.dtos.usuario.LoginUsuarioDto;
 import com.maace.connectEtec.dtos.usuario.CadastroUsuarioDto;
 import com.maace.connectEtec.dtos.usuario.ValidarUsuarioDto;
+import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.security.TokenService;
 import com.maace.connectEtec.services.PerfilUsuarioService;

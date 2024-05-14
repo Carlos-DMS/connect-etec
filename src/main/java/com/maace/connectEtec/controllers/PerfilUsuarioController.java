@@ -1,8 +1,11 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.perfilUsuario.CadastroPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.usuario.BuscarUsuarioDto;
+import com.maace.connectEtec.dtos.perfilUsuario.EditarPerfilUsuarioDto;
+import com.maace.connectEtec.dtos.perfilUsuario.AcessarPerfilUsuarioDto;
 import com.maace.connectEtec.dtos.perfilUsuario.RespostaPerfilUsuarioDto;
-import com.maace.connectEtec.models.PerfilUsuarioModel;
+import com.maace.connectEtec.dtos.post.RespostaPostDto;
+import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PerfilUsuarioService;
 import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
@@ -25,7 +28,7 @@ public class PerfilUsuarioController {
     UsuarioService usuarioService;
 
     @PutMapping("/editar")
-    public ResponseEntity editar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid EditarPerfilDto editarPerfilDto) {
+    public ResponseEntity editar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid EditarPerfilUsuarioDto editarPerfilDto) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if(usuario != null) {
@@ -42,7 +45,7 @@ public class PerfilUsuarioController {
         if (perfis != null) {
             return ResponseEntity.status(HttpStatus.OK).body(perfis);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @GetMapping("/buscarMeuPerfil")
@@ -54,7 +57,7 @@ public class PerfilUsuarioController {
         if (acessarPerfilUsuarioDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @GetMapping("/buscarPerfil")
@@ -64,7 +67,7 @@ public class PerfilUsuarioController {
         if (acessarPerfilUsuarioDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @GetMapping("/buscarMeusPosts")
@@ -76,7 +79,7 @@ public class PerfilUsuarioController {
         if (!posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(posts);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @GetMapping("/buscarPosts")
@@ -86,6 +89,6 @@ public class PerfilUsuarioController {
         if (!posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(posts);
         }
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
