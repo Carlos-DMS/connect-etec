@@ -26,12 +26,12 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST).permitAll()
+                        .requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/usuario/recuperarConta", "/usuario/mudarSenha").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)
                 .build();
-        //30:00 ensinando a utilizar permissões especificas para cada endpoint.
     }
 
     @Bean

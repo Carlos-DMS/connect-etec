@@ -1,8 +1,6 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.LoginUsuarioDto;
-import com.maace.connectEtec.dtos.CadastroUsuarioDto;
-import com.maace.connectEtec.dtos.ValidarUsuarioDto;
+import com.maace.connectEtec.dtos.*;
 import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.security.TokenService;
@@ -70,5 +68,22 @@ public class UsuarioController {
                     usuario.getNomeSocial(), usuario.getTipoUsuario()));
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/recuperarConta")
+    public ResponseEntity<Integer> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
+        Integer resposta = usuarioService.recuperarConta(contaDto.login());
+
+        if (resposta != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(resposta);
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/mudarSenha")
+    public ResponseEntity mudarSenha(@RequestBody @Valid MudarSenhaDto mudarSenhaDto) {
+        usuarioService.mudarSenha(mudarSenhaDto.login(), mudarSenhaDto.senha());
+
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 }
