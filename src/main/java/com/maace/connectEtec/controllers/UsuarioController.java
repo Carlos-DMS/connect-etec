@@ -15,6 +15,8 @@ import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 
 @RestController
 @RequestMapping("/usuario")
@@ -71,8 +73,8 @@ public class UsuarioController {
     }
 
     @GetMapping("/recuperarConta")
-    public ResponseEntity<Integer> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
-        Integer resposta = usuarioService.recuperarConta(contaDto.login());
+    public ResponseEntity<UUID> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
+        UUID resposta = usuarioService.recuperarConta(contaDto.login());
 
         if (resposta != null) {
             return ResponseEntity.status(HttpStatus.OK).body(resposta);
@@ -82,8 +84,16 @@ public class UsuarioController {
 
     @GetMapping("/mudarSenha")
     public ResponseEntity mudarSenha(@RequestBody @Valid MudarSenhaDto mudarSenhaDto) {
-        usuarioService.mudarSenha(mudarSenhaDto.login(), mudarSenhaDto.senha());
+        boolean resultado = usuarioService.mudarSenha(
+                UUID.fromString(mudarSenhaDto.idRequest()),
+                mudarSenhaDto.numeroDeRecuperacao(),
+                mudarSenhaDto.login(),
+                mudarSenhaDto.senha()
+        );
 
-        return ResponseEntity.status(HttpStatus.OK).build();
+        if (resultado) {
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }
