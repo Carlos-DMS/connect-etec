@@ -74,24 +74,41 @@ public class UsuarioController {
 
     @GetMapping("/recuperarConta")
     public ResponseEntity<UUID> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
-        UUID resposta = usuarioService.recuperarConta(contaDto.login());
+        UUID idRequest = usuarioService.recuperarConta(contaDto.login());
 
-        if (resposta != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(resposta);
+        if (idRequest != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(idRequest);
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/mudarSenha")
-    public ResponseEntity mudarSenha(@RequestBody @Valid MudarSenhaDto mudarSenhaDto) {
-        boolean resultado = usuarioService.mudarSenha(
-                UUID.fromString(mudarSenhaDto.idRequest()),
-                mudarSenhaDto.numeroDeRecuperacao(),
-                mudarSenhaDto.login(),
-                mudarSenhaDto.senha()
+    @PatchMapping("/mudarSenha")
+    public ResponseEntity mudarSenha(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid MudarSenhaDto mudarSenhaDto
+    ) {
+        boolean validadeDaOperacao = usuarioService.mudarSenha(
+                usuarioService.buscarPorToken(authorizationHeader),
+                mudarSenhaDto.senhaAntiga(),
+                mudarSenhaDto.novaSenha()
         );
 
-        if (resultado) {
+        if (validadeDaOperacao) {
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PatchMapping("/mudarSenhaPorRequest")
+    public ResponseEntity mudarSenhaPorRequest(@RequestBody @Valid MudarSenhaPorRequestDto mudarSenhaPorRequestDto) {
+        boolean validadeDaOperacao = usuarioService.mudarSenhaPorRequest(
+                UUID.fromString(mudarSenhaPorRequestDto.idRequest()),
+                mudarSenhaPorRequestDto.numeroDeRecuperacao(),
+                mudarSenhaPorRequestDto.login(),
+                mudarSenhaPorRequestDto.senha()
+        );
+
+        if (validadeDaOperacao) {
             return ResponseEntity.status(HttpStatus.OK).build();
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();

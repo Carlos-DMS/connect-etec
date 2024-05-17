@@ -27,7 +27,8 @@ public class SecurityConfiguration {
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
                         .requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login").permitAll()
-                        .requestMatchers(HttpMethod.GET, "/usuario/recuperarConta", "/usuario/mudarSenha").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/usuario/recuperarConta").permitAll()
+                        .requestMatchers(HttpMethod.PATCH, "/usuario/mudarSenhaPorRequest").permitAll()
                         .anyRequest().authenticated()
                 )
                 .addFilterBefore(securityFilter, UsernamePasswordAuthenticationFilter.class)

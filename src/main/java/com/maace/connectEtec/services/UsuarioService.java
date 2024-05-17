@@ -59,8 +59,18 @@ public class UsuarioService implements UserDetailsService {
         return null;
     }
 
-    public boolean mudarSenha(UUID idRequest, Integer codigoDeRecuperacao, String email, String senha) {
-        UsuarioModel usuario = usuarioRepository.findByLogin(email);
+    public boolean mudarSenha(UsuarioModel usuario, String senhaAntiga, String novaSenha) {
+        if (usuario != null && encoder.matches(senhaAntiga, usuario.getSenha())) {
+            usuario.setSenha(encoder.encode(novaSenha));
+            usuarioRepository.save(usuario);
+            return true;
+        }
+        return false;
+    }
+
+
+    public boolean mudarSenhaPorRequest(UUID idRequest, Integer codigoDeRecuperacao, String login, String senha) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<RequestRecuperacaoSenhaModel> request = requestRecuperacaoSenhaRepository.findById(idRequest);
 
         if (usuario != null && request.isPresent() &&
