@@ -72,7 +72,7 @@ public class UsuarioController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/recuperarConta")
+    @PostMapping("/recuperarConta")
     public ResponseEntity<UUID> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
         UUID idRequest = usuarioService.recuperarConta(contaDto.login());
 
