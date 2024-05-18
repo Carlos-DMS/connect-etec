@@ -7,19 +7,19 @@ import java.util.Random;
 import java.util.UUID;
 
 @Entity
-@Table(name="tb_request_recuperacao_senha")
-public class RequestRecuperacaoSenhaModel {
+@Table(name="tb_request_validacao")
+public class RequestValidacaoModel {
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
     private UUID idRequest;
     private String login;
-    private final Integer codigoDeRecuperacao = new Random().nextInt(900000) + 100000;
+    private final Integer codigoDeValidacao = new Random().nextInt(900000) + 100000;
     private final LocalDateTime momento = LocalDateTime.now();
 
-    public RequestRecuperacaoSenhaModel() {
+    public RequestValidacaoModel() {
     }
 
-    public RequestRecuperacaoSenhaModel(String login) {
+    public RequestValidacaoModel(String login) {
         this.login = login;
     }
 
@@ -35,8 +35,8 @@ public class RequestRecuperacaoSenhaModel {
         this.login = login;
     }
 
-    public Integer getCodigoDeRecuperacao() {
-        return codigoDeRecuperacao;
+    public Integer getCodigoDeValidacao() {
+        return codigoDeValidacao;
     }
 
     public LocalDateTime getMomento() {

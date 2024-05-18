@@ -26,7 +26,11 @@ public class SecurityConfiguration {
                 .csrf(csrf -> csrf.disable())
                 .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(HttpMethod.POST, "/usuario/cadastrar", "/usuario/login", "/usuario/recuperarConta").permitAll()
+                        .requestMatchers(HttpMethod.POST,
+                                "/usuario/cadastrar",
+                                "/usuario/login",
+                                "/usuario/recuperarConta",
+                                "/usuario/emailValidacao").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/usuario/mudarSenhaPorRequest").permitAll()
                         .anyRequest().authenticated()
                 )

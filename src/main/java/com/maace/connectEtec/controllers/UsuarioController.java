@@ -1,13 +1,10 @@
 package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.*;
-import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.security.TokenService;
-import com.maace.connectEtec.services.PerfilUsuarioService;
 import com.maace.connectEtec.services.UsuarioService;
 import jakarta.validation.Valid;
-import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -31,23 +28,23 @@ public class UsuarioController {
     @Autowired
     private TokenService tokenService;
 
-    @Autowired
-    private PerfilUsuarioService perfilUsuarioService;
+    @PostMapping("/emailValidacao")
+    public ResponseEntity<UUID> emailValidacao(@RequestBody @Valid LoginDto loginDto) {
+        UUID idRequest = usuarioService.mandarEmailDeValidacao(loginDto.login());
+
+        return ResponseEntity.status(HttpStatus.OK).body(idRequest);
+    }
 
     @PostMapping("/cadastrar")
     public ResponseEntity salvar(@RequestBody @Valid CadastroUsuarioDto cadastroUsuarioDto) {
-        if (usuarioService.loadUserByUsername(cadastroUsuarioDto.login()) == null) {
-            UsuarioModel usuario = new UsuarioModel();
-            PerfilUsuarioModel perfil = new PerfilUsuarioModel();
-
-            BeanUtils.copyProperties(cadastroUsuarioDto, usuario);
-
-            perfilUsuarioService.criarPerfilUsuario(perfil);
-
-            usuario.setIdPerfilUsuario(perfil.getIdPerfil());
-
-            usuarioService.cadastrar(usuario);
-
+        if (usuarioService.loadUserByUsername(cadastroUsuarioDto.login()) == null &&
+                usuarioService.cadastrar(
+                cadastroUsuarioDto,
+                UUID.fromString(cadastroUsuarioDto.idRequest()),
+                cadastroUsuarioDto.codigoDeValidacao()
+            )
+        )
+        {
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
@@ -73,8 +70,8 @@ public class UsuarioController {
     }
 
     @PostMapping("/recuperarConta")
-    public ResponseEntity<UUID> recuperarConta(@RequestBody @Valid RecuperarContaDto contaDto) {
-        UUID idRequest = usuarioService.recuperarConta(contaDto.login());
+    public ResponseEntity<UUID> recuperarConta(@RequestBody @Valid LoginDto loginDto) {
+        UUID idRequest = usuarioService.recuperarConta(loginDto.login());
 
         if (idRequest != null) {
             return ResponseEntity.status(HttpStatus.OK).body(idRequest);

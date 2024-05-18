@@ -1,10 +1,13 @@
 package com.maace.connectEtec.services;
 
-import com.maace.connectEtec.models.RequestRecuperacaoSenhaModel;
+import com.maace.connectEtec.dtos.CadastroUsuarioDto;
+import com.maace.connectEtec.models.PerfilUsuarioModel;
+import com.maace.connectEtec.models.RequestValidacaoModel;
 import com.maace.connectEtec.models.UsuarioModel;
-import com.maace.connectEtec.repositories.RequestRecuperacaoSenhaRepository;
+import com.maace.connectEtec.repositories.RequestValidacaoRepository;
 import com.maace.connectEtec.repositories.UsuarioRepository;
 import com.maace.connectEtec.security.TokenService;
+import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -24,10 +27,13 @@ public class UsuarioService implements UserDetailsService {
     UsuarioRepository usuarioRepository;
 
     @Autowired
-    RequestRecuperacaoSenhaRepository requestRecuperacaoSenhaRepository;
+    RequestValidacaoRepository requestValidacaoRepository;
 
     @Autowired
     private PasswordEncoder encoder;
+
+    @Autowired
+    private PerfilUsuarioService perfilUsuarioService;
 
     @Autowired
     private TokenService tokenService;
@@ -40,23 +46,44 @@ public class UsuarioService implements UserDetailsService {
         return usuarioRepository.findByLogin(login);
     }
 
-    public void cadastrar(UsuarioModel usuario) {
-        usuario.setSenha(encoder.encode(usuario.getSenha()));
-        usuarioRepository.save(usuario);
+    public boolean cadastrar(CadastroUsuarioDto cadastroUsuarioDto,
+                          UUID idRequest,
+                          Integer codigoDeValidacao)
+    {
+        if (validacaoDeRequest(idRequest, codigoDeValidacao)) {
+            UsuarioModel usuario = new UsuarioModel();
+            PerfilUsuarioModel perfil = new PerfilUsuarioModel();
+
+            BeanUtils.copyProperties(cadastroUsuarioDto, usuario);
+
+            perfilUsuarioService.criarPerfilUsuario(perfil);
+
+            usuario.setIdPerfilUsuario(perfil.getIdPerfil());
+
+            usuario.setSenha(encoder.encode(usuario.getSenha()));
+            usuarioRepository.save(usuario);
+
+            return true;
+        }
+        return false;
     }
 
     public UUID recuperarConta(String destinatario) {
         UsuarioModel usuario = usuarioRepository.findByLogin(destinatario);
 
         if (usuario != null) {
-            RequestRecuperacaoSenhaModel request = new RequestRecuperacaoSenhaModel(destinatario);
-            requestRecuperacaoSenhaRepository.save(request);
-
-            emailService.enviarEmailRecuperacaoSenha(destinatario, request.getCodigoDeRecuperacao());
-
-            return request.getIdRequest();
+            return mandarEmailDeValidacao(destinatario);
         }
         return null;
+    }
+
+    public UUID mandarEmailDeValidacao(String destinatario) {
+        RequestValidacaoModel request = new RequestValidacaoModel(destinatario);
+        requestValidacaoRepository.save(request);
+
+        emailService.enviarEmailDeValidacao(destinatario, request.getCodigoDeValidacao());
+
+        return request.getIdRequest();
     }
 
     public boolean mudarSenha(UsuarioModel usuario, String senhaAntiga, String novaSenha) {
@@ -68,14 +95,13 @@ public class UsuarioService implements UserDetailsService {
         return false;
     }
 
-
-    public boolean mudarSenhaPorRequest(UUID idRequest, Integer codigoDeRecuperacao, String login, String senha) {
+    public boolean mudarSenhaPorRequest(UUID idRequest,
+                                        Integer codigoDeRecuperacao,
+                                        String login, String senha)
+    {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
-        Optional<RequestRecuperacaoSenhaModel> request = requestRecuperacaoSenhaRepository.findById(idRequest);
 
-        if (usuario != null && request.isPresent() &&
-                request.get().getMomento().plusMinutes(10).isAfter(LocalDateTime.now()) &&
-                Objects.equals(request.get().getCodigoDeRecuperacao(), codigoDeRecuperacao)) {
+        if (usuario != null && validacaoDeRequest(idRequest, codigoDeRecuperacao)) {
 
             usuario.setSenha(encoder.encode(senha));
             usuarioRepository.save(usuario);
@@ -84,6 +110,15 @@ public class UsuarioService implements UserDetailsService {
         }
         return false;
     }
+
+    public boolean validacaoDeRequest(UUID idRequest, Integer codigoDeValidacao) {
+        Optional<RequestValidacaoModel> request = requestValidacaoRepository.findById(idRequest);
+
+        return request.isPresent() &&
+                request.get().getMomento().plusMinutes(10).isAfter(LocalDateTime.now()) &&
+                Objects.equals(request.get().getCodigoDeValidacao(), codigoDeValidacao);
+    }
+
 
     public UsuarioModel buscarPorToken(String authorizationHeader) {
         String token = extrairToken(authorizationHeader);

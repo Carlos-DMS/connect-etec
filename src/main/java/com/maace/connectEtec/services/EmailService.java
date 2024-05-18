@@ -16,26 +16,26 @@ public class EmailService {
     @Value("${spring.mail.username}")
     private String remetente;
 
-    public String enviarEmailRecuperacaoSenha(String destinatario, int numeroRecuperacao) {
+    public String enviarEmailDeValidacao(String destinatario, int numeroDeValicao) {
         try {
             MimeMessage mimeMessage = javaMailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mimeMessage, true, "UTF-8");
 
             helper.setFrom(remetente);
             helper.setTo(destinatario);
-            helper.setSubject("Recuperação de Senha");
+            helper.setSubject("Código de Validação");
 
             String mensagemHtml = "<html><body style='text-align:center;'>" +
-                    "<p style='font-size:24px;'>Seu número de recuperação de senha é:</p>" +
-                    "<p style='font-size:36px; font-weight:bold;'>" + numeroRecuperacao + "</p>" +
+                    "<p style='font-size:24px;'>Seu número de validação é:</p>" +
+                    "<p style='font-size:36px; font-weight:bold;'>" + numeroDeValicao + "</p>" +
                     "</body></html>";
 
             helper.setText(mensagemHtml, true);
 
             javaMailSender.send(mimeMessage);
-            return "E-mail de recuperação de senha enviado com sucesso";
+            return "E-mail de validação enviado com sucesso";
         } catch (MessagingException e) {
-            return "Erro ao enviar e-mail de recuperação de senha: " + e.getMessage();
+            return "Erro ao enviar e-mail de validação: " + e.getMessage();
         }
     }
 }
