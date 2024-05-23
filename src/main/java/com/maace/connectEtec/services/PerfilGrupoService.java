@@ -1,11 +1,17 @@
 package com.maace.connectEtec.services;
 
-import com.maace.connectEtec.dtos.perfilGrupo.AtualizarPerfilGrupoDto;
-import com.maace.connectEtec.models.PerfilGrupoModel;
+import com.maace.connectEtec.dtos.perfilGrupo.AcessarPerfilGrupoDto;
+import com.maace.connectEtec.dtos.perfilGrupo.EditarPerfilGrupoDto;
+import com.maace.connectEtec.dtos.post.RespostaPostDto;
+import com.maace.connectEtec.models.*;
+import com.maace.connectEtec.repositories.GrupoRepository;
 import com.maace.connectEtec.repositories.PerfilGrupoRepository;
+import com.maace.connectEtec.repositories.PostRepository;
+import com.maace.connectEtec.repositories.UsuarioRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
@@ -17,14 +23,19 @@ public class PerfilGrupoService {
     PerfilGrupoRepository repository;
 
     @Autowired
-    UsuarioService usuarioService;
+    GrupoRepository grupoRepository;
 
     @Autowired
-    GrupoService grupoService;
+    PostRepository postRepository;
 
-    public PerfilGrupoModel criarPerfilGrupo(PerfilGrupoModel perfilGrupo) {
-        return repository.save(perfilGrupo);
-    } //nao precisa de um criar, so update
+    @Autowired
+    UsuarioRepository usuarioRepository;
+
+    @Autowired
+    PerfilUsuarioService perfilUsuarioService;
+
+    @Autowired
+    UsuarioService usuarioService;
 
     public Optional<PerfilGrupoModel> buscarPorId(UUID id){
         return repository.findById(id);
@@ -34,22 +45,77 @@ public class PerfilGrupoService {
         return repository.findAll();
     }
 
-    public PerfilGrupoModel atualizarPerfilGrupo(UUID id, AtualizarPerfilGrupoDto perfilGrupoDto){
-        Optional<PerfilGrupoModel> perfilOptional = repository.findById(id);
+    public boolean editarDados(GrupoModel grupo, EditarPerfilGrupoDto perfilGrupoDto, String usuarioToken){
+        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.getIdPerfilGrupo());
+        List<String> usuariosGrupo = grupo.getLoginUsuarios();
+        UsuarioModel usuario = usuarioService.buscarPorToken(usuarioToken);
 
-        if (perfilOptional.isPresent()) {
+        if (perfilOptional.isPresent() && usuariosGrupo.contains(usuario.getLogin())) {
             PerfilGrupoModel perfil = perfilOptional.get();
 
-            if (perfilGrupoDto.sobre() != null) perfil.setSobre(perfilGrupoDto.sobre());
-            if (perfilGrupoDto.urlFotoPerfil() != null) perfil.setUrlFotoPerfil(perfilGrupoDto.urlFotoPerfil());
+            grupo.setNome(perfilGrupoDto.nome());
+            perfilOptional.get().setUrlFotoPerfil(perfilGrupoDto.urlFotoPerfil());
+            perfilOptional.get().setSobre(perfilGrupoDto.sobre());
 
-            return repository.save(perfil);
+            repository.save(perfil);
+            grupoRepository.save(grupo);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public AcessarPerfilGrupoDto acessarPerfilGrupo(UUID id){
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+        Optional<PerfilGrupoModel> perfil = buscarPerfilGrupo(id);
+
+        if(grupo.isPresent()){
+            return new AcessarPerfilGrupoDto(
+                    grupo.get().getNome(),
+                    perfil.get().getUrlFotoPerfil(),
+                    perfil.get().getSobre()
+            );
         }
 
         return null;
     }
 
-    public void deletarPerfilGrupo(UUID id, String userToken){
-        if(grupoService.deletarGrupo(id, userToken)) repository.deleteById(id);
+    public Optional<PerfilGrupoModel> buscarPerfilGrupo(UUID idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(idGrupo);
+        UUID idPerfilGrupo = grupo.get().getIdGrupo();
+
+        return repository.findById(idPerfilGrupo);
+    }
+
+    public List<Optional<RespostaPostDto>> buscarPosts(UUID id){
+        Optional<PerfilGrupoModel> perfilGrupo = buscarPerfilGrupo(id);
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+
+        List<UUID> idPosts = perfilGrupo.get().getIdPosts();
+        List<Optional<RespostaPostDto>> posts = new ArrayList<>();
+
+        if(grupo.isEmpty()) return null;
+
+        for(UUID idPost : idPosts){
+            Optional<PostModel> post = postRepository.findById(idPost);
+            Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioService.buscarPerfil(post.get().getLoginAutor());
+            UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+
+            posts.add(Optional.of(new RespostaPostDto(
+                    post.get().getIdPost(),
+                    perfilUsuarioService.selecionarNomeExibido(usuario),
+                    perfilUsuario.get().getUrlFotoPerfil(),
+                    grupo.get().getNome(),
+                    perfilGrupo.get().getUrlFotoPerfil(),
+                    post.get().getUrlMidia(),
+                    post.get().getMomentoPublicacao(),
+                    post.get().getConteudo(),
+                    post.get().getQtdLike(),
+                    post.get().getTagRelatorio()
+            )));
+        }
+
+        return null;
     }
 }

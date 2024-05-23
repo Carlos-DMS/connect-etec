@@ -22,7 +22,7 @@ public class GrupoController {
     private GrupoService grupoService;
 
     @GetMapping("/buscarPerfil")
-    public ResponseEntity<RespostaGrupoDto> buscarPorId(@PathVariable UUID id){
+    public ResponseEntity<RespostaGrupoDto> buscarPorId(UUID id){
         Optional<GrupoModel> grupoOptional = grupoService.buscarPorId(id);
         if(grupoOptional.isPresent()){
             RespostaGrupoDto grupoDto = new RespostaGrupoDto(grupoOptional.get().getIdGrupo(), grupoOptional.get().getNome(), grupoOptional.get().getIdPerfilGrupo());
@@ -45,7 +45,7 @@ public class GrupoController {
     }
 
     @PutMapping("/{id}")
-    public ResponseEntity atualizar(@PathVariable UUID id, String nome){
+    public ResponseEntity atualizar(UUID id, String nome){
         boolean atulizado = grupoService.atualizarGrupo(id, nome);
         if(atulizado) return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();

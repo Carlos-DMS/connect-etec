@@ -175,7 +175,4 @@ public class PerfilUsuarioService {
 
         return nome;
     }
-
-
-    //FAZER UM UPDATE!!!
 }
