@@ -30,9 +30,12 @@ public class UsuarioController {
 
     @PostMapping("/emailValidacao")
     public ResponseEntity<UUID> emailValidacao(@RequestBody @Valid LoginDto loginDto) {
-        UUID idRequest = usuarioService.mandarEmailDeValidacao(loginDto.login());
+        UUID idRequest = usuarioService.emailCadastro(loginDto.login());
 
-        return ResponseEntity.status(HttpStatus.OK).body(idRequest);
+        if (idRequest != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(idRequest);
+        }
+        return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @PostMapping("/cadastrar")

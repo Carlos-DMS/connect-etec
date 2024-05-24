@@ -10,6 +10,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -82,6 +83,8 @@ public class PerfilUsuarioController {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(usuario.getLogin());
+
+        Collections.reverse(posts);
 
         if (!posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(posts);

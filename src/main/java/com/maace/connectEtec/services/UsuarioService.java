@@ -77,6 +77,15 @@ public class UsuarioService implements UserDetailsService {
         return null;
     }
 
+    public UUID emailCadastro(String destinatario) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(destinatario);
+
+        if (usuario == null) {
+            return mandarEmailDeValidacao(destinatario);
+        }
+        return null;
+    }
+
     public UUID mandarEmailDeValidacao(String destinatario) {
         RequestValidacaoModel request = new RequestValidacaoModel(destinatario);
         requestValidacaoRepository.save(request);
@@ -119,7 +128,6 @@ public class UsuarioService implements UserDetailsService {
                 Objects.equals(request.get().getCodigoDeValidacao(), codigoDeValidacao);
     }
 
-
     public UsuarioModel buscarPorToken(String authorizationHeader) {
         String token = extrairToken(authorizationHeader);
         if (token != null) {
@@ -136,5 +144,4 @@ public class UsuarioService implements UserDetailsService {
         }
         return null;
     }
-
 }

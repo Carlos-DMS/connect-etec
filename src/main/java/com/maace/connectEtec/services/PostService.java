@@ -23,7 +23,6 @@ public class PostService {
     @Autowired
     PerfilUsuarioRepository perfilUsuarioRepository;
 
-
     public void criar (CriarPostDto criarPostDto, UsuarioModel usuario) {
         PostModel post = new PostModel();
 
