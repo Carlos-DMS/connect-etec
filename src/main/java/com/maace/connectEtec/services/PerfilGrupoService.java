@@ -1,7 +1,9 @@
 package com.maace.connectEtec.services;
 
 import com.maace.connectEtec.dtos.perfilGrupo.AcessarPerfilGrupoDto;
-import com.maace.connectEtec.dtos.perfilGrupo.EditarPerfilGrupoDto;
+import com.maace.connectEtec.dtos.perfilGrupo.EditarDadosPerfilGrupoDto;
+import com.maace.connectEtec.dtos.perfilGrupo.EditarFotoPerfilGrupoDto;
+import com.maace.connectEtec.dtos.perfilGrupo.RespostaPerfilGrupoDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.*;
 import com.maace.connectEtec.repositories.GrupoRepository;
@@ -37,38 +39,79 @@ public class PerfilGrupoService {
     @Autowired
     UsuarioService usuarioService;
 
-    public Optional<PerfilGrupoModel> buscarPorId(UUID id){
-        return repository.findById(id);
+    public Optional<RespostaPerfilGrupoDto> buscarPorId(UUID id){
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+
+        if(grupo.isPresent()){
+            Optional<PerfilGrupoModel> perfil = repository.findById(grupo.get().getIdPerfilGrupo());
+            RespostaPerfilGrupoDto perfilDto = new RespostaPerfilGrupoDto(grupo.get().getNome(), perfil.get().getUrlFotoPerfil());
+
+            return Optional.of(perfilDto);
+        }
+
+        return Optional.empty();
     }
 
-    public List<PerfilGrupoModel> listarTodos() {
-        return repository.findAll();
+    public List<RespostaPerfilGrupoDto> listarTodos() {
+        List<GrupoModel> grupos = grupoRepository.findAll();
+        List<RespostaPerfilGrupoDto> perfisDto = new ArrayList<>();
+
+        for(GrupoModel grupo : grupos){
+            Optional<PerfilGrupoModel> perfil = repository.findById(grupo.getIdPerfilGrupo());
+            perfisDto.add(new RespostaPerfilGrupoDto(grupo.getNome(), perfil.get().getUrlFotoPerfil()));
+        }
+
+        return perfisDto;
     }
 
-    public boolean editarDados(GrupoModel grupo, EditarPerfilGrupoDto perfilGrupoDto, String usuarioToken){
-        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.getIdPerfilGrupo());
-        List<String> usuariosGrupo = grupo.getLoginUsuarios();
+    public boolean editarDados(EditarDadosPerfilGrupoDto perfilGrupoDto, UsuarioModel usuario){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(perfilGrupoDto.idGrupo()));
+        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.get().getIdPerfilGrupo());
+
+
+        if (perfilOptional.isPresent()) {
+            if(grupo.get().getLoginModeradores().contains(usuario.getLogin()) || grupo.get().getLoginDono().equals(usuario.getLogin())){
+
+                PerfilGrupoModel perfil = perfilOptional.get();
+
+                grupo.get().setNome(perfilGrupoDto.nome());
+                perfilOptional.get().setSobre(perfilGrupoDto.sobre());
+
+                repository.save(perfil);
+                grupoRepository.save(grupo.get());
+
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public boolean editarFotoPerfil(EditarFotoPerfilGrupoDto fotoDto, String usuarioToken){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(fotoDto.idGrupo()));
+        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.get().getIdPerfilGrupo());
         UsuarioModel usuario = usuarioService.buscarPorToken(usuarioToken);
 
-        if (perfilOptional.isPresent() && usuariosGrupo.contains(usuario.getLogin())) {
-            PerfilGrupoModel perfil = perfilOptional.get();
+        if (perfilOptional.isPresent()) {
+            if(grupo.get().getLoginModeradores().contains(usuario.getLogin()) || grupo.get().getLoginDono().equals(usuario.getLogin())){
 
-            grupo.setNome(perfilGrupoDto.nome());
-            perfilOptional.get().setUrlFotoPerfil(perfilGrupoDto.urlFotoPerfil());
-            perfilOptional.get().setSobre(perfilGrupoDto.sobre());
+                PerfilGrupoModel perfil = perfilOptional.get();
+                perfil.setUrlFotoPerfil(fotoDto.urlFotoPerfil());
 
-            repository.save(perfil);
-            grupoRepository.save(grupo);
+                repository.save(perfil);
+                grupoRepository.save(grupo.get());
 
-            return true;
+                return true;
+            }
         }
+
 
         return false;
     }
 
     public AcessarPerfilGrupoDto acessarPerfilGrupo(UUID id){
         Optional<GrupoModel> grupo = grupoRepository.findById(id);
-        Optional<PerfilGrupoModel> perfil = buscarPerfilGrupo(id);
+        Optional<PerfilGrupoModel> perfil = repository.findById(id);
 
         if(grupo.isPresent()){
             return new AcessarPerfilGrupoDto(
@@ -81,21 +124,14 @@ public class PerfilGrupoService {
         return null;
     }
 
-    public Optional<PerfilGrupoModel> buscarPerfilGrupo(UUID idGrupo){
-        Optional<GrupoModel> grupo = grupoRepository.findById(idGrupo);
-        UUID idPerfilGrupo = grupo.get().getIdGrupo();
-
-        return repository.findById(idPerfilGrupo);
-    }
-
     public List<Optional<RespostaPostDto>> buscarPosts(UUID id){
-        Optional<PerfilGrupoModel> perfilGrupo = buscarPerfilGrupo(id);
+        Optional<PerfilGrupoModel> perfilGrupo = repository.findById(id);
         Optional<GrupoModel> grupo = grupoRepository.findById(id);
+
+        if(grupo.isEmpty() || perfilGrupo.isEmpty()) return null;
 
         List<UUID> idPosts = perfilGrupo.get().getIdPosts();
         List<Optional<RespostaPostDto>> posts = new ArrayList<>();
-
-        if(grupo.isEmpty()) return null;
 
         for(UUID idPost : idPosts){
             Optional<PostModel> post = postRepository.findById(idPost);

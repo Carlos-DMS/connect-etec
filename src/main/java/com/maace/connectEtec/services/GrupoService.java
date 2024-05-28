@@ -1,9 +1,14 @@
 package com.maace.connectEtec.services;
 
+import com.maace.connectEtec.dtos.grupo.CriarGrupoDto;
+import com.maace.connectEtec.dtos.grupo.IdGrupoDto;
+import com.maace.connectEtec.dtos.grupo.RespostaGrupoDto;
 import com.maace.connectEtec.models.EnumTipoUsuario;
 import com.maace.connectEtec.models.GrupoModel;
+import com.maace.connectEtec.models.PerfilGrupoModel;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.repositories.GrupoRepository;
+import com.maace.connectEtec.repositories.PerfilGrupoRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -14,73 +19,115 @@ import java.util.*;
 public class GrupoService {
 
     @Autowired
-    GrupoRepository repository;
+    GrupoRepository grupoRepository;
 
     @Autowired
     UsuarioService usuarioService;
 
-    public void criarGrupo(GrupoModel grupo) {
-        repository.save(grupo);
+    @Autowired
+    PerfilGrupoRepository perfilGrupoRepository;
+
+    public void criarGrupo(CriarGrupoDto grupoDto, String donoLogin) {
+        PerfilGrupoModel perfilGrupo = new PerfilGrupoModel();
+        perfilGrupo.setUrlFotoPerfil(grupoDto.urlFotoPerfil());
+        perfilGrupo.setSobre(grupoDto.sobre());
+        perfilGrupoRepository.save(perfilGrupo);
+
+        GrupoModel grupo = new GrupoModel();
+        grupo.setNome(grupoDto.nome());
+        grupo.setLoginDono(donoLogin);
+        grupo.setIdPerfilGrupo(perfilGrupo.getIdPerfil());
+        grupoRepository.save(grupo);
     }
 
-    public Optional<GrupoModel> buscarPorId(UUID id) {
-        return repository.findById(id);
+    public RespostaGrupoDto buscarPorId(UUID id) {
+        Optional<GrupoModel> grupoOptional = grupoRepository.findById(id);
+        if(grupoOptional.isPresent()){
+            Optional<PerfilGrupoModel> perfil = perfilGrupoRepository.findById(grupoOptional.get().getIdPerfilGrupo());
+            return new RespostaGrupoDto(grupoOptional.get().getIdGrupo(), grupoOptional.get().getNome(), perfil.get().getUrlFotoPerfil(), grupoOptional.get().getIdPerfilGrupo());
+        }
+        return null;
     }
 
-    public List<GrupoModel> listarTodos() {
-        return repository.findAll();
+    public List<RespostaGrupoDto> listarTodos() {
+        List<GrupoModel> grupos = grupoRepository.findAll();
+        if(!grupos.isEmpty()){
+            List<RespostaGrupoDto> gruposDto = new ArrayList<>();
+            for(GrupoModel grupo : grupos){
+                Optional<PerfilGrupoModel> perfil = perfilGrupoRepository.findById(grupo.getIdPerfilGrupo());
+                gruposDto.add(new RespostaGrupoDto(grupo.getIdGrupo(), grupo.getNome(), perfil.get().getUrlFotoPerfil(), grupo.getIdPerfilGrupo()));
+            }
+            return gruposDto;
+        }
+        return null;
     }
 
-    public boolean atualizarGrupo(UUID id, String nome) {
-        Optional<GrupoModel> antigoGrupo = buscarPorId(id);
+    public boolean tornarModerador(String loginUsuario, IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.id()));
 
-        if (antigoGrupo.isPresent()) {
-            GrupoModel novoGrupo = antigoGrupo.get();
-            novoGrupo.setNome(nome);
-            repository.save(novoGrupo);
+        if(grupo.isPresent() && !grupo.get().getLoginModeradores().contains(loginUsuario)){
+            grupo.get().getLoginModeradores().add(loginUsuario);
             return true;
         }
 
+        return false;
+    }
+
+    public boolean rebaixarModerador(String loginUsuario, IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.id()));
+
+        if(grupo.isPresent() && grupo.get().getLoginModeradores().contains(loginUsuario)){
+            grupo.get().getLoginModeradores().remove(loginUsuario);
+
+            return true;
+        }
+
+        return false;
+    }
+
+    public boolean adicionarUsuario(String loginUsuario, IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.id()));
+        if(grupo.isPresent() && !grupo.get().getLoginUsuarios().contains(loginUsuario)){
+            grupo.get().getLoginUsuarios().add(loginUsuario);
+            return true;
+        }
+        return false;
+    }
+
+    public boolean removerUsuario(String loginUsuario, IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.id()));
+        if(grupo.isPresent()){
+            if(grupo.get().getLoginUsuarios().contains(loginUsuario)){
+                grupo.get().getLoginUsuarios().remove(loginUsuario);
+            }
+            if(grupo.get().getLoginModeradores().contains(loginUsuario)){
+                grupo.get().getLoginModeradores().remove(loginUsuario);
+            }
+            return true;
+        }
         return false;
     }
 
     public boolean deletarGrupo(UUID id, String userToken) {
         UsuarioModel usuario = usuarioService.buscarPorToken(userToken);
-        Optional<GrupoModel> grupo = buscarPorId(id);
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
 
         if (usuario == null || grupo.isEmpty()) return false;
 
         if (EnumTipoUsuario.ADMINISTRADOR == usuario.getTipoUsuario()
                 || Objects.equals(grupo.get().getLoginDono(), usuario.getLogin())) {
-            repository.deleteById(id);
+
+            grupoRepository.deleteById(id);
+            perfilGrupoRepository.deleteById(grupo.get().getIdPerfilGrupo());
+
             return true;
         }
 
         return false;
     }
 
-    public List<UserDetails> todosUsuarios(UUID id) { //retorna somente usuarios comuns
-        Optional<GrupoModel> grupo = buscarPorId(id);
-        List<String> logins = grupo.map(GrupoModel::getLoginUsuarios).orElse(null);
-        List<UserDetails> usuarios = new ArrayList<>();
-
-        for(String login : logins) usuarios.add(usuarioService.loadUserByUsername(login));
-
-        return usuarios;
-    }
-
-    public List<UserDetails> todosAdmins(UUID id) { //retorna somente administradores
-        Optional<GrupoModel> grupo = buscarPorId(id);
-        List<String> logins = grupo.map(GrupoModel::getLoginAdmins).orElse(null);
-        List<UserDetails> admins = new ArrayList<>();
-
-        for(String login : logins) admins.add(usuarioService.loadUserByUsername(login));
-
-        return admins;
-    }
-
     public List<UserDetails> todosMembros(UUID id) { //retorna todos sem exceção
-        Optional<GrupoModel> grupoOptional = buscarPorId(id);
+        Optional<GrupoModel> grupoOptional = grupoRepository.findById(id);
 
         if (grupoOptional.isPresent()) {
             GrupoModel grupo = grupoOptional.get();

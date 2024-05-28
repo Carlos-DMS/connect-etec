@@ -27,7 +27,7 @@ public class PerfilUsuarioController {
     @Autowired
     UsuarioService usuarioService;
 
-    @PutMapping("/editar")
+    @PatchMapping("/editar")
     public ResponseEntity editar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid EditarPerfilUsuarioDto editarPerfilDto) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
@@ -35,7 +35,8 @@ public class PerfilUsuarioController {
             perfilUsuarioService.editarPerfil(editarPerfilDto, usuario);
             return ResponseEntity.status(HttpStatus.OK).build();
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @GetMapping("/listarTodos")

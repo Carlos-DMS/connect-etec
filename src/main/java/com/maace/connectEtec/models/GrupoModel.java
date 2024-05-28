@@ -21,7 +21,7 @@ public class GrupoModel implements Serializable {
     private UUID idPerfilGrupo;
     private String loginDono;
     private List<String> loginUsuarios;
-    private List<String> loginAdmins;
+    private List<String> loginModeradores;
 
     public UUID getIdGrupo() {
         return idGrupo;
@@ -55,7 +55,7 @@ public class GrupoModel implements Serializable {
         return loginUsuarios;
     }
 
-    public List<String> getLoginAdmins() {
-        return loginAdmins;
+    public List<String> getLoginModeradores() {
+        return loginModeradores;
     }
 }
