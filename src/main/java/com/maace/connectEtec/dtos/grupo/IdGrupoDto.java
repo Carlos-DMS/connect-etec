@@ -1,5 +1,7 @@
 package com.maace.connectEtec.dtos.grupo;
 
+import jakarta.validation.constraints.NotBlank;
+
 public record IdGrupoDto(
-        String id
+        @NotBlank String id
 ) { }

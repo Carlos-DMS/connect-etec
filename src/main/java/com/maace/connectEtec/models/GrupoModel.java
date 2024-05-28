@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -20,8 +21,14 @@ public class GrupoModel implements Serializable {
     private String nome;
     private UUID idPerfilGrupo;
     private String loginDono;
-    private List<String> loginUsuarios;
-    private List<String> loginModeradores;
+    @ElementCollection
+    @CollectionTable(name = "tb_grupo_usuarios", joinColumns = @JoinColumn(name = "grupo_id"))
+    @Column(name = "login_usuario")
+    private List<String> loginUsuarios = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "tb_grupo_moderadores", joinColumns = @JoinColumn(name = "grupo_id"))
+    @Column(name = "login_usuario")
+    private List<String> loginModeradores = new ArrayList<>();
 
     public UUID getIdGrupo() {
         return idGrupo;

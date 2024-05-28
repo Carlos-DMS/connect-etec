@@ -23,7 +23,13 @@ public class PerfilUsuarioModel implements Serializable {
     @CollectionTable(name = "tb_perfil_usuario_posts", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
     @Column(name = "post_id")
     private List<UUID> idPosts = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_conexoes", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "conexao_id")
     private List<String> loginConexoes = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_grupos", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "grupo_id")
     private List<UUID> idGrupos = new ArrayList<>();
 
     public UUID getIdPerfil() {

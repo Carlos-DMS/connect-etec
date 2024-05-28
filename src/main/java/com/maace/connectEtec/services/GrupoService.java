@@ -41,10 +41,11 @@ public class GrupoService {
     }
 
     public RespostaGrupoDto buscarPorId(UUID id) {
-        Optional<GrupoModel> grupoOptional = grupoRepository.findById(id);
-        if(grupoOptional.isPresent()){
-            Optional<PerfilGrupoModel> perfil = perfilGrupoRepository.findById(grupoOptional.get().getIdPerfilGrupo());
-            return new RespostaGrupoDto(grupoOptional.get().getIdGrupo(), grupoOptional.get().getNome(), perfil.get().getUrlFotoPerfil(), grupoOptional.get().getIdPerfilGrupo());
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+
+        if(grupo.isPresent()){
+            Optional<PerfilGrupoModel> perfil = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo());
+            return new RespostaGrupoDto(grupo.get().getIdGrupo(), grupo.get().getNome(), perfil.get().getUrlFotoPerfil());
         }
         return null;
     }
@@ -55,7 +56,7 @@ public class GrupoService {
             List<RespostaGrupoDto> gruposDto = new ArrayList<>();
             for(GrupoModel grupo : grupos){
                 Optional<PerfilGrupoModel> perfil = perfilGrupoRepository.findById(grupo.getIdPerfilGrupo());
-                gruposDto.add(new RespostaGrupoDto(grupo.getIdGrupo(), grupo.getNome(), perfil.get().getUrlFotoPerfil(), grupo.getIdPerfilGrupo()));
+                gruposDto.add(new RespostaGrupoDto(grupo.getIdGrupo(), grupo.getNome(), perfil.get().getUrlFotoPerfil()));
             }
             return gruposDto;
         }
@@ -85,10 +86,11 @@ public class GrupoService {
         return false;
     }
 
-    public boolean adicionarUsuario(String loginUsuario, IdGrupoDto idGrupo){
-        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.id()));
+    public boolean entrarNoGrupo(String loginUsuario, UUID id){
+        Optional<GrupoModel> grupo = grupoRepository.findById(id);
         if(grupo.isPresent() && !grupo.get().getLoginUsuarios().contains(loginUsuario)){
             grupo.get().getLoginUsuarios().add(loginUsuario);
+            grupoRepository.save(grupo.get());
             return true;
         }
         return false;
@@ -112,17 +114,16 @@ public class GrupoService {
         UsuarioModel usuario = usuarioService.buscarPorToken(userToken);
         Optional<GrupoModel> grupo = grupoRepository.findById(id);
 
-        if (usuario == null || grupo.isEmpty()) return false;
+        if (usuario != null && grupo.isPresent()){
+            if (usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR
+                    || Objects.equals(usuario.getLogin(), grupo.get().getLoginDono()))
+            {
+                perfilGrupoRepository.deleteById(grupo.get().getIdPerfilGrupo());
+                grupoRepository.deleteById(id);
 
-        if (EnumTipoUsuario.ADMINISTRADOR == usuario.getTipoUsuario()
-                || Objects.equals(grupo.get().getLoginDono(), usuario.getLogin())) {
-
-            grupoRepository.deleteById(id);
-            perfilGrupoRepository.deleteById(grupo.get().getIdPerfilGrupo());
-
-            return true;
+                return true;
+            }
         }
-
         return false;
     }
 
@@ -134,11 +135,12 @@ public class GrupoService {
             List<String> logins = grupo.getLoginUsuarios();
             List<UserDetails> membros = new ArrayList<>();
 
-            for(String login : logins) membros.add(usuarioService.loadUserByUsername(login));
+            for(String login : logins) {
+                membros.add(usuarioService.loadUserByUsername(login));
+            }
 
             return membros;
         }
-
         return null;
     }
 }

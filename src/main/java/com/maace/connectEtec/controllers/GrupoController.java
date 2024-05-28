@@ -26,66 +26,76 @@ public class GrupoController {
     @Autowired
     UsuarioService usuarioService;
 
-    @PostMapping("/criarGrupo")
+    @PostMapping("/criar")//separa pra criar o grupo (nome e id perfil) e so editar o resto no perfilGrupo
     public ResponseEntity criarGrupo(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CriarGrupoDto grupoDto){
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if(usuario != null){
-            grupoService.criarGrupo(grupoDto, authorizationHeader);
+            grupoService.criarGrupo(grupoDto, usuario.getLogin());
             return ResponseEntity.status(HttpStatus.OK).build();
         }
-
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/buscarPorId")
-    public ResponseEntity<RespostaGrupoDto> buscarPorId(IdGrupoDto grupoDto){
+    @PostMapping("/buscarPorId")
+    public ResponseEntity<RespostaGrupoDto> buscarPorId(@RequestBody @Valid IdGrupoDto grupoDto){
         RespostaGrupoDto respostaDto = grupoService.buscarPorId(UUID.fromString(grupoDto.id()));
 
-        return ResponseEntity.status(HttpStatus.OK).build();
-    }  //TESTANDO...!!!
+        if (respostaDto != null){
+            return ResponseEntity.status(HttpStatus.OK).body(respostaDto);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
-    @GetMapping("/listarTodos")
+    @GetMapping("/listarTodos")//manda essa versão pra perfilGrupo
     public ResponseEntity<List<RespostaGrupoDto>> listarTodos() {
         List<RespostaGrupoDto> gruposDto = grupoService.listarTodos();
-        if(gruposDto != null) return ResponseEntity.status(HttpStatus.OK).body(gruposDto);
+        if(gruposDto != null){
+            return ResponseEntity.status(HttpStatus.OK).body(gruposDto);
+        }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @DeleteMapping("/deletar")
-    public ResponseEntity deletar(IdGrupoDto idGrupo, @RequestHeader("Authorization") String authorizationHeader){
+    public ResponseEntity deletar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
         boolean deletado = grupoService.deletarGrupo(UUID.fromString(idGrupo.id()), authorizationHeader);
-        if(deletado) return ResponseEntity.status(HttpStatus.OK).build();
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        if(deletado){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping("/membros")
-    public ResponseEntity<List<UserDetails>> todosMembros(IdGrupoDto id) {
+    @PostMapping("/membros")
+    public ResponseEntity<List<UserDetails>> todosMembros(@RequestBody @Valid IdGrupoDto id) {
         List<UserDetails> membros = grupoService.todosMembros(UUID.fromString(id.id()));
         if(membros != null) return ResponseEntity.status(HttpStatus.OK).body(membros);
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/tornarModerador")
-    public ResponseEntity tornarModerador(@RequestHeader("Authorization") String authorizationHeader, IdGrupoDto idGrupo){
+    public ResponseEntity tornarModerador(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
         if(grupoService.tornarModerador(authorizationHeader, idGrupo)) return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @PatchMapping("/rebaixarModerador")
-    public ResponseEntity rebaixarModerador(@RequestHeader("Authorization") String authorizationHeader, IdGrupoDto idGrupo){
+    public ResponseEntity rebaixarModerador(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
         if(grupoService.rebaixarModerador(authorizationHeader, idGrupo)) return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
-    @PatchMapping("/adicionarUsuario")
-    public ResponseEntity adicionarUsuario(@RequestHeader("Authorization") String authorizationHeader, IdGrupoDto idGrupo){
-        if(grupoService.adicionarUsuario(authorizationHeader, idGrupo)) return ResponseEntity.status(HttpStatus.OK).build();
+    @PatchMapping("/entrarNoGrupo")
+    public ResponseEntity<String> entrarNoGrupo(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        if(grupoService.entrarNoGrupo(usuario.getLogin(), UUID.fromString(idGrupo.id()))) {
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
 
     @PatchMapping("/removerUsuario")
-    public ResponseEntity removerUsuario(@RequestHeader("Authorization") String authorizationHeader, IdGrupoDto idGrupo){
+    public ResponseEntity removerUsuario(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
         if(grupoService.removerUsuario(authorizationHeader, idGrupo)) return ResponseEntity.status(HttpStatus.OK).build();
         return ResponseEntity.status(HttpStatus.CONFLICT).build();
     }
