@@ -29,7 +29,7 @@ public class PostService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    public void criar (CriarPostDto criarPostDto, UsuarioModel usuario) {
+    public void criar(CriarPostDto criarPostDto, UsuarioModel usuario) {
         PostModel post = new PostModel();
 
         post.setLoginAutor(usuario.getLogin());
@@ -39,8 +39,7 @@ public class PostService {
 
         if (criarPostDto.idGrupo() != null) {
             post.setIdGrupo(UUID.fromString(criarPostDto.idGrupo()));
-        }
-        else{
+        } else {
             post.setIdGrupo(null);
         }
 
@@ -88,5 +87,21 @@ public class PostService {
         Collections.reverse(postsDto);
 
         return postsDto;
+    }
+
+    public Boolean curtir(UUID idPost, boolean estaCurtido) {
+        Optional<PostModel> post = postRepository.findById(idPost);
+
+        if (post.isPresent()) {
+            if (estaCurtido) {
+                post.get().darLike();
+                return true;
+            }
+            else {
+                post.get().removerLike();
+                return false;
+            }
+        }
+        return null;
     }
 }
