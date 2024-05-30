@@ -39,7 +39,7 @@ public class UsuarioController {
     }
 
     @PostMapping("/cadastrar")
-    public ResponseEntity salvar(@RequestBody @Valid CadastroUsuarioDto cadastroUsuarioDto) {
+    public ResponseEntity cadastrar(@RequestBody @Valid CadastroUsuarioDto cadastroUsuarioDto) {
         if (usuarioService.loadUserByUsername(cadastroUsuarioDto.login()) == null &&
                 usuarioService.cadastrar(
                 cadastroUsuarioDto,

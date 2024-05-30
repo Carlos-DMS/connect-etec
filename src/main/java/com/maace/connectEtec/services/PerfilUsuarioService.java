@@ -10,7 +10,6 @@ import java.util.*;
 
 @Service
 public class PerfilUsuarioService {
-
     @Autowired
     PerfilUsuarioRepository perfilUsuarioRepository;
 
@@ -68,7 +67,7 @@ public class PerfilUsuarioService {
         UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
 
-        if (usuario != null) {
+        if (usuario != null && perfil.isPresent()) {
             return new AcessarPerfilUsuarioDto(
                     usuario.getNomeCompleto(),
                     usuario.getNomeSocial(),
@@ -80,8 +79,8 @@ public class PerfilUsuarioService {
         return null;
     }
 
-    public List<Optional<RespostaPostDto>> buscarPosts(String loginUsuario) {
-        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(loginUsuario);
+    public List<Optional<RespostaPostDto>> buscarPosts(String login) {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(login);
 
         List<UUID> idPosts = perfilUsuario.get().getIdPosts();
 
@@ -111,6 +110,7 @@ public class PerfilUsuarioService {
                     post.get().getConteudo(),
                     post.get().getQtdLike(),
                     post.get().momentoFormatado(),
+                    postCurtidoPeloUsuario(login, post.get().getIdPost()),
                     post.get().getTagRelatorio()
             )));
         }
@@ -179,6 +179,13 @@ public class PerfilUsuarioService {
         return nome;
     }
 
+    public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
 
-    //REALMENTE NECESSARIO FAZER UM UPDATE? SIM!
+        if (perfil.isPresent()){
+            return perfil.get().getIdPostsCurtidos().contains(idPost);
+        }
+        return null;
+    }
 }

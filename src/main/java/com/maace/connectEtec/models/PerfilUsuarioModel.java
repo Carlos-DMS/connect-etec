@@ -23,6 +23,10 @@ public class PerfilUsuarioModel implements Serializable {
     @CollectionTable(name = "tb_perfil_usuario_posts", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
     @Column(name = "post_id")
     private List<UUID> idPosts = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_posts_curtidos", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "post_curtido_id")
+    private List<UUID> idPostsCurtidos = new ArrayList<>();
     private List<String> loginConexoes = new ArrayList<>();
     private List<UUID> idGrupos = new ArrayList<>();
 
@@ -48,6 +52,18 @@ public class PerfilUsuarioModel implements Serializable {
 
     public void addIdPost(UUID idPost) {
         idPosts.add(idPost);
+    }
+
+    public List<UUID> getIdPostsCurtidos() {
+        return idPostsCurtidos;
+    }
+
+    public void curtirPost(UUID idPost) {
+        idPostsCurtidos.add(idPost);
+    }
+
+    public void removerCurtidaPost(UUID idPost) {
+        idPostsCurtidos.remove(idPost);
     }
 
     public List<UUID> getIdPosts() {

@@ -14,5 +14,6 @@ public record RespostaPostDto(
         String conteudo,
         Integer qtdLike,
         String momento,
+        Boolean postCurtido,
         String tag
 ) { }

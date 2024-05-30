@@ -54,7 +54,7 @@ public class PostService {
         perfilUsuarioRepository.save(perfil.get());
     }
 
-    public List<Optional<RespostaPostDto>> listarPosts() {
+    public List<Optional<RespostaPostDto>> listarPosts(UsuarioModel usuario) {
 
         List<PostModel> posts = postRepository.findAll();
         List<Optional<RespostaPostDto>> postsDto = new ArrayList<>();
@@ -65,8 +65,8 @@ public class PostService {
             Optional<GrupoModel> grupo = Optional.empty();
             Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
 
-            UsuarioModel usuario = usuarioRepository.findByLogin(post.getLoginAutor());
-            Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+            UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.getLoginAutor());
+            Optional<PerfilUsuarioModel> perfilUsuarioAutor = perfilUsuarioRepository.findById(usuarioAutor.getIdPerfilUsuario());
 
             if (post.getIdGrupo() != null) {
                 grupo = grupoRepository.findById(post.getIdGrupo());
@@ -77,8 +77,8 @@ public class PostService {
 
             postsDto.add(Optional.of(new RespostaPostDto(
                     post.getIdPost(),
-                    perfilUsuarioService.selecionarNomeExibido(usuario),
-                    perfilUsuario.get().getUrlFotoPerfil(),
+                    perfilUsuarioService.selecionarNomeExibido(usuarioAutor),
+                    perfilUsuarioAutor.get().getUrlFotoPerfil(),
                     grupo.isPresent() ? grupo.get().getNome() : null,
                     perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
                     post.getUrlMidia(),
@@ -86,25 +86,49 @@ public class PostService {
                     post.getConteudo(),
                     post.getQtdLike(),
                     post.momentoFormatado(),
+                    postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio()
             )));
         }
-
         return postsDto;
     }
 
-    public Boolean curtir(UUID idPost, boolean estaCurtido) {
+    public Boolean curtir(String login, UUID idPost, boolean estaCurtido) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
         Optional<PostModel> post = postRepository.findById(idPost);
 
-        if (post.isPresent()) {
-            if (estaCurtido) {
-                post.get().darLike();
+        if (post.isPresent() && perfil.isPresent()) {
+            if (!estaCurtido) {
+                post.get().curtir();
+                perfil.get().curtirPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
                 return true;
             }
             else {
-                post.get().removerLike();
+                post.get().removerCurtida();
+                perfil.get().removerCurtidaPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
                 return false;
             }
+
+        }
+        return null;
+    }
+
+    public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        if (perfil.isPresent()){
+            return perfil.get().getIdPostsCurtidos().contains(idPost);
         }
         return null;
     }

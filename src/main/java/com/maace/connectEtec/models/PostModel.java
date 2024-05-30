@@ -68,11 +68,11 @@ public class PostModel implements Serializable {
         return qtdLike;
     }
 
-    public void darLike() {
+    public void curtir() {
         this.qtdLike += 1;
     }
 
-    public void removerLike() {
+    public void removerCurtida() {
         this.qtdLike -= 1;
     }
 
