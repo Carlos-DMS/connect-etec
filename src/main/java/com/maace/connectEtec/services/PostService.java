@@ -82,10 +82,9 @@ public class PostService {
                     grupo.isPresent() ? grupo.get().getNome() : null,
                     perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
                     post.getUrlMidia(),
-                    post.getMomentoPublicacao(),
                     post.getConteudo(),
-                    post.getQtdLike(),
                     post.momentoFormatado(),
+                    post.getQtdLike(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio()
             )));

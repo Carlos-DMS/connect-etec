@@ -10,10 +10,9 @@ public record RespostaPostDto(
         String nomeGrupo,
         String urlFotoPerfilGrupo,
         String urlMidia,
-        LocalDateTime momentoPublicacao,
         String conteudo,
-        Integer qtdLike,
         String momento,
+        Integer qtdLike,
         Boolean postCurtido,
         String tag
 ) { }

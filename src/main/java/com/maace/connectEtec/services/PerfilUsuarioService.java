@@ -106,10 +106,9 @@ public class PerfilUsuarioService {
                     (grupo.isPresent()) ? grupo.get().getNome() : null,
                     (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
                     post.get().getUrlMidia(),
-                    post.get().getMomentoPublicacao(),
                     post.get().getConteudo(),
-                    post.get().getQtdLike(),
                     post.get().momentoFormatado(),
+                    post.get().getQtdLike(),
                     postCurtidoPeloUsuario(login, post.get().getIdPost()),
                     post.get().getTagRelatorio()
             )));
