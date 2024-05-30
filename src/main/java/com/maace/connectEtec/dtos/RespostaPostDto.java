@@ -13,5 +13,6 @@ public record RespostaPostDto(
         LocalDateTime momentoPublicacao,
         String conteudo,
         Integer qtdLike,
+        String momento,
         String tag
 ) { }

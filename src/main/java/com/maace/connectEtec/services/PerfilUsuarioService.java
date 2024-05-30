@@ -110,6 +110,7 @@ public class PerfilUsuarioService {
                     post.get().getMomentoPublicacao(),
                     post.get().getConteudo(),
                     post.get().getQtdLike(),
+                    post.get().momentoFormatado(),
                     post.get().getTagRelatorio()
             )));
         }

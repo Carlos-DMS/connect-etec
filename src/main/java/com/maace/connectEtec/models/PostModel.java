@@ -5,11 +5,12 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name="tb_post")
+@Table(name = "tb_post")
 public class PostModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -32,6 +33,11 @@ public class PostModel implements Serializable {
 
     public LocalDateTime getMomentoPublicacao() {
         return momentoPublicacao;
+    }
+
+    public String momentoFormatado() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
+        return momentoPublicacao.format(formato);
     }
 
     public String getLoginAutor() {

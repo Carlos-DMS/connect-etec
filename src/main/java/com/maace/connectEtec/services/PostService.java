@@ -59,6 +59,8 @@ public class PostService {
         List<PostModel> posts = postRepository.findAll();
         List<Optional<RespostaPostDto>> postsDto = new ArrayList<>();
 
+        posts.sort(Comparator.comparing(PostModel::getMomentoPublicacao).reversed());
+
         for (PostModel post : posts) {
             Optional<GrupoModel> grupo = Optional.empty();
             Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
@@ -68,23 +70,25 @@ public class PostService {
 
             if (post.getIdGrupo() != null) {
                 grupo = grupoRepository.findById(post.getIdGrupo());
-                perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                if (grupo.isPresent()){
+                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                }
             }
 
             postsDto.add(Optional.of(new RespostaPostDto(
                     post.getIdPost(),
                     perfilUsuarioService.selecionarNomeExibido(usuario),
                     perfilUsuario.get().getUrlFotoPerfil(),
-                    (grupo.isPresent()) ? grupo.get().getNome() : null,
-                    (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                    grupo.isPresent() ? grupo.get().getNome() : null,
+                    perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
                     post.getUrlMidia(),
                     post.getMomentoPublicacao(),
                     post.getConteudo(),
                     post.getQtdLike(),
+                    post.momentoFormatado(),
                     post.getTagRelatorio()
             )));
         }
-        Collections.reverse(postsDto);
 
         return postsDto;
     }
