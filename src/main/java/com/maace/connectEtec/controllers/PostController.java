@@ -21,7 +21,8 @@ public class PostController {
     UsuarioService usuarioService;
 
     @PostMapping("/criar")
-    public ResponseEntity criar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CriarPostDto criarPostDto){
+    public ResponseEntity criar(@RequestHeader("Authorization") String authorizationHeader,
+                                @RequestBody @Valid CriarPostDto criarPostDto){
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if (usuario != null) {

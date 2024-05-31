@@ -79,7 +79,7 @@ public class GrupoService {
         return false;
     }
 
-    public List<UserDetails> todosMembros(IdGrupoDto idGrupo) { //retorna todos sem exceção
+    public List<UserDetails> todosMembros(IdGrupoDto idGrupo) {
         Optional<GrupoModel> grupoOptional = grupoRepository.findById(UUID.fromString(idGrupo.idGrupo()));
 
         if (grupoOptional.isPresent()) {

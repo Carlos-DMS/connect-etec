@@ -1,5 +1,6 @@
 package com.maace.connectEtec.services;
 
+import com.maace.connectEtec.dtos.perfilUsuario.EditarFotoPerfilDto;
 import com.maace.connectEtec.dtos.perfilUsuario.EditarPerfilUsuarioDto;
 import com.maace.connectEtec.dtos.perfilUsuario.AcessarPerfilUsuarioDto;
 import com.maace.connectEtec.dtos.perfilUsuario.RespostaPerfilUsuarioDto;
@@ -37,16 +38,23 @@ public class PerfilUsuarioService {
         perfilUsuarioRepository.save(perfilUsuario);
     }
 
-    public void editarPerfil(EditarPerfilUsuarioDto atualizarPerfilDto, UsuarioModel usuario) {
+    public void editarDadosPerfil(EditarPerfilUsuarioDto atualizarPerfilDto, UsuarioModel usuario) {
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(usuario.getLogin());
 
         usuario.setNomeCompleto(atualizarPerfilDto.nomeCompleto());
         usuario.setNomeSocial(atualizarPerfilDto.nomeSocial());
 
-        perfil.get().setUrlFotoPerfil(atualizarPerfilDto.urlFotoPerfil());
         perfil.get().setSobre(atualizarPerfilDto.sobre());
 
         usuarioRepository.save(usuario);
+        perfilUsuarioRepository.save(perfil.get());
+    }
+
+    public void editarFotoPerfil(EditarFotoPerfilDto fotoDto, UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfil = buscarPerfil(usuario.getLogin());
+
+        perfil.get().setUrlFotoPerfil(fotoDto.urlFotoPerfil());
+
         perfilUsuarioRepository.save(perfil.get());
     }
 

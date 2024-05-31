@@ -6,6 +6,5 @@ import jakarta.validation.constraints.NotBlank;
 public record EditarPerfilUsuarioDto(
         @NotBlank String nomeCompleto,
         @NullableNotBlank String nomeSocial,
-        @NullableNotBlank String urlFotoPerfil,
         @NullableNotBlank String sobre
-) { }
+) {}
