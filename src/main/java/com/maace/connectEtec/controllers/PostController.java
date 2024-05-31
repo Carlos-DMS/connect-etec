@@ -28,6 +28,7 @@ public class PostController {
             postService.criar(criarPostDto, usuario);
             return ResponseEntity.status(HttpStatus.CREATED).build();
         }
+
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 }

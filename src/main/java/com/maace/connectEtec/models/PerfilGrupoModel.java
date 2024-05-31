@@ -45,4 +45,7 @@ public class PerfilGrupoModel implements Serializable {
         return idPosts;
     }
 
+    public void addIdPosts(UUID idPost){
+        this.idPosts.add(idPost);
+    }
 }
