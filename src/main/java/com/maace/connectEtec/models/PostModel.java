@@ -63,8 +63,12 @@ public class PostModel implements Serializable {
         return qtdLike;
     }
 
-    public void setQtdLike(Integer qtdLike) {
-        this.qtdLike = qtdLike;
+    public void darLike() {
+        this.qtdLike += 1;
+    }
+
+    public void removerLike() {
+        this.qtdLike -= 1;
     }
 
     public void setTag(String tag) {
