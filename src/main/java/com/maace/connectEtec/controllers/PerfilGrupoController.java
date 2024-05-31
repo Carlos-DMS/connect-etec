@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @RestController
 @RequestMapping("/perfilGrupo")
@@ -29,35 +28,36 @@ public class PerfilGrupoController {
     @Autowired
     UsuarioService usuarioService;
 
-    @GetMapping("/buscarPorId")
-    public ResponseEntity<Optional<RespostaPerfilGrupoDto>> buscarPorId(IdGrupoDto idGrupoDto){
-        Optional<RespostaPerfilGrupoDto> perfil = perfilGrupoService.buscarPorId(UUID.fromString(idGrupoDto.id()));
+    @PostMapping("/buscarPorId")
+    public ResponseEntity<RespostaPerfilGrupoDto> buscarPorId(@RequestBody @Valid IdGrupoDto idGrupo){
+        RespostaPerfilGrupoDto perfil = perfilGrupoService.buscarPorId(idGrupo);
 
-        if(perfil.isPresent()){
+        if(perfil != null){
             return ResponseEntity.status(HttpStatus.OK).body(perfil);
         }
 
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
-    @GetMapping("/acessarPerfil")
-    public ResponseEntity<AcessarPerfilGrupoDto> acessarPerfilGrupo(UUID id){
-        AcessarPerfilGrupoDto acessoDto = perfilGrupoService.acessarPerfilGrupo(id);
-        if(acessoDto != null) return ResponseEntity.status(HttpStatus.OK).body(acessoDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
-    @GetMapping("/buscarPosts")
-    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(UUID id){
-        List<Optional<RespostaPostDto>> postDto = perfilGrupoService.buscarPosts(id);
-        if(postDto != null) return ResponseEntity.status(HttpStatus.OK).body(postDto);
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
-    }
-
     @GetMapping("/listarTodos")
     public ResponseEntity<List<RespostaPerfilGrupoDto>> listarTodos(){
         List<RespostaPerfilGrupoDto> perfisDto = perfilGrupoService.listarTodos();
-        if(!perfisDto.isEmpty()) return ResponseEntity.status(HttpStatus.OK).body(perfisDto);
+
+        if(!perfisDto.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body(perfisDto);
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PostMapping("/buscarPosts")
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestBody @Valid IdGrupoDto idGrupo){
+        List<Optional<RespostaPostDto>> postDto = perfilGrupoService.buscarPosts(idGrupo);
+
+        if(postDto != null || !postDto.isEmpty()){
+            return ResponseEntity.status(HttpStatus.OK).body(postDto);
+        }
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
@@ -65,14 +65,68 @@ public class PerfilGrupoController {
     public ResponseEntity editarDados(@RequestHeader("Authorization") String authorizationHeader,
                                       @RequestBody @Valid EditarDadosPerfilGrupoDto editarDadosPerfilGrupoDto){
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
-        if(perfilGrupoService.editarDados(editarDadosPerfilGrupoDto, usuario)) return ResponseEntity.status(HttpStatus.OK).build();
+
+        if(perfilGrupoService.editarDados(editarDadosPerfilGrupoDto, usuario)){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 
     @PatchMapping("/editarFoto")
     public ResponseEntity editarFoto(@RequestHeader("Authorization") String authorizationHeader,
                                      @RequestBody @Valid EditarFotoPerfilGrupoDto editarFotoPerfilGrupoDto){
-        if(perfilGrupoService.editarFotoPerfil(editarFotoPerfilGrupoDto, authorizationHeader)) return ResponseEntity.status(HttpStatus.OK).build();
+        if(perfilGrupoService.editarFotoPerfil(editarFotoPerfilGrupoDto, authorizationHeader)){
+            return ResponseEntity.status(HttpStatus.OK).build();
+        }
+
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
+
+    @PostMapping("/acessarPerfil")
+    public ResponseEntity<AcessarPerfilGrupoDto> acessarPerfilGrupo(@RequestBody @Valid IdGrupoDto idGrupo){
+        AcessarPerfilGrupoDto acessoDto = perfilGrupoService.acessarPerfilGrupo(idGrupo);
+
+        if(acessoDto != null){
+            return ResponseEntity.status(HttpStatus.OK).body(acessoDto);
+        }
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

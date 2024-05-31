@@ -1,5 +1,6 @@
 package com.maace.connectEtec.services;
 
+import com.maace.connectEtec.dtos.grupo.IdGrupoDto;
 import com.maace.connectEtec.dtos.perfilGrupo.AcessarPerfilGrupoDto;
 import com.maace.connectEtec.dtos.perfilGrupo.EditarDadosPerfilGrupoDto;
 import com.maace.connectEtec.dtos.perfilGrupo.EditarFotoPerfilGrupoDto;
@@ -22,7 +23,7 @@ import java.util.UUID;
 public class PerfilGrupoService {
 
     @Autowired
-    PerfilGrupoRepository repository;
+    PerfilGrupoRepository perfilGrupoRepository;
 
     @Autowired
     GrupoRepository grupoRepository;
@@ -39,45 +40,45 @@ public class PerfilGrupoService {
     @Autowired
     UsuarioService usuarioService;
 
-    public Optional<RespostaPerfilGrupoDto> buscarPorId(UUID id){
-        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+    public RespostaPerfilGrupoDto buscarPorId(IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.idGrupo()));
 
         if(grupo.isPresent()){
-            Optional<PerfilGrupoModel> perfil = repository.findById(grupo.get().getIdPerfilGrupo());
-            RespostaPerfilGrupoDto perfilDto = new RespostaPerfilGrupoDto(grupo.get().getNome(), perfil.get().getUrlFotoPerfil());
-
-            return Optional.of(perfilDto);
+            Optional<PerfilGrupoModel> perfilOptional = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo());
+            return new RespostaPerfilGrupoDto(grupo.get().getIdGrupo().toString(), grupo.get().getNome(), perfilOptional.get().getUrlFotoPerfil());
         }
 
-        return Optional.empty();
+        return null;
     }
 
     public List<RespostaPerfilGrupoDto> listarTodos() {
         List<GrupoModel> grupos = grupoRepository.findAll();
-        List<RespostaPerfilGrupoDto> perfisDto = new ArrayList<>();
 
-        for(GrupoModel grupo : grupos){
-            Optional<PerfilGrupoModel> perfil = repository.findById(grupo.getIdPerfilGrupo());
-            perfisDto.add(new RespostaPerfilGrupoDto(grupo.getNome(), perfil.get().getUrlFotoPerfil()));
+        if (!grupos.isEmpty()){
+            List<RespostaPerfilGrupoDto> perfisDto = new ArrayList<>();
+            for (GrupoModel grupo : grupos) {
+                Optional<PerfilGrupoModel> perfilOptional = perfilGrupoRepository.findById(grupo.getIdPerfilGrupo());
+                perfisDto.add(new RespostaPerfilGrupoDto(grupo.getIdGrupo().toString(), grupo.getNome(), perfilOptional.get().getUrlFotoPerfil()));
+            }
+            return perfisDto;
         }
 
-        return perfisDto;
+        return null;
     }
 
     public boolean editarDados(EditarDadosPerfilGrupoDto perfilGrupoDto, UsuarioModel usuario){
         Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(perfilGrupoDto.idGrupo()));
-        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.get().getIdPerfilGrupo());
 
+        if (grupo.isPresent()) {
+            Optional<PerfilGrupoModel> perfilOptional = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo());
 
-        if (perfilOptional.isPresent()) {
             if(grupo.get().getLoginModeradores().contains(usuario.getLogin()) || grupo.get().getLoginDono().equals(usuario.getLogin())){
-
                 PerfilGrupoModel perfil = perfilOptional.get();
 
                 grupo.get().setNome(perfilGrupoDto.nome());
                 perfilOptional.get().setSobre(perfilGrupoDto.sobre());
 
-                repository.save(perfil);
+                perfilGrupoRepository.save(perfil);
                 grupoRepository.save(grupo.get());
 
                 return true;
@@ -89,16 +90,17 @@ public class PerfilGrupoService {
 
     public boolean editarFotoPerfil(EditarFotoPerfilGrupoDto fotoDto, String usuarioToken){
         Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(fotoDto.idGrupo()));
-        Optional<PerfilGrupoModel> perfilOptional = repository.findById(grupo.get().getIdPerfilGrupo());
-        UsuarioModel usuario = usuarioService.buscarPorToken(usuarioToken);
 
-        if (perfilOptional.isPresent()) {
+        if (grupo.isPresent()) {
+            Optional<PerfilGrupoModel> perfilOptional = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo());
+            UsuarioModel usuario = usuarioService.buscarPorToken(usuarioToken);
+
             if(grupo.get().getLoginModeradores().contains(usuario.getLogin()) || grupo.get().getLoginDono().equals(usuario.getLogin())){
 
                 PerfilGrupoModel perfil = perfilOptional.get();
                 perfil.setUrlFotoPerfil(fotoDto.urlFotoPerfil());
 
-                repository.save(perfil);
+                perfilGrupoRepository.save(perfil);
                 grupoRepository.save(grupo.get());
 
                 return true;
@@ -109,47 +111,48 @@ public class PerfilGrupoService {
         return false;
     }
 
-    public AcessarPerfilGrupoDto acessarPerfilGrupo(UUID id){
-        Optional<GrupoModel> grupo = grupoRepository.findById(id);
-        Optional<PerfilGrupoModel> perfil = repository.findById(id);
+    public List<Optional<RespostaPostDto>> buscarPosts(IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.idGrupo()));
 
         if(grupo.isPresent()){
-            return new AcessarPerfilGrupoDto(
-                    grupo.get().getNome(),
-                    perfil.get().getUrlFotoPerfil(),
-                    perfil.get().getSobre()
-            );
+            PerfilGrupoModel perfil = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo()).get();
+            List<UUID> idPosts = perfil.getIdPosts();
+            List<Optional<RespostaPostDto>> posts = new ArrayList<>();
+
+            for(UUID idPost : idPosts){
+                Optional<PostModel> post = postRepository.findById(idPost);
+                Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioService.buscarPerfil(post.get().getLoginAutor());
+                UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+
+                posts.add(Optional.of(new RespostaPostDto(
+                        post.get().getIdPost(),
+                        perfilUsuarioService.selecionarNomeExibido(usuario),
+                        perfilUsuario.get().getUrlFotoPerfil(),
+                        grupo.get().getNome(),
+                        perfil.getUrlFotoPerfil(),
+                        post.get().getUrlMidia(),
+                        post.get().getMomentoPublicacao(),
+                        post.get().getConteudo(),
+                        post.get().getQtdLike(),
+                        post.get().getTagRelatorio()
+                )));
+            }
+            return posts;
         }
 
         return null;
     }
 
-    public List<Optional<RespostaPostDto>> buscarPosts(UUID id){
-        Optional<PerfilGrupoModel> perfilGrupo = repository.findById(id);
-        Optional<GrupoModel> grupo = grupoRepository.findById(id);
+    public AcessarPerfilGrupoDto acessarPerfilGrupo(IdGrupoDto idGrupo){
+        Optional<GrupoModel> grupo = grupoRepository.findById(UUID.fromString(idGrupo.idGrupo()));
 
-        if(grupo.isEmpty() || perfilGrupo.isEmpty()) return null;
-
-        List<UUID> idPosts = perfilGrupo.get().getIdPosts();
-        List<Optional<RespostaPostDto>> posts = new ArrayList<>();
-
-        for(UUID idPost : idPosts){
-            Optional<PostModel> post = postRepository.findById(idPost);
-            Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioService.buscarPerfil(post.get().getLoginAutor());
-            UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
-
-            posts.add(Optional.of(new RespostaPostDto(
-                    post.get().getIdPost(),
-                    perfilUsuarioService.selecionarNomeExibido(usuario),
-                    perfilUsuario.get().getUrlFotoPerfil(),
+        if(grupo.isPresent()){
+            Optional<PerfilGrupoModel> perfilOptional = perfilGrupoRepository.findById(grupo.get().getIdPerfilGrupo());
+            return new AcessarPerfilGrupoDto(
                     grupo.get().getNome(),
-                    perfilGrupo.get().getUrlFotoPerfil(),
-                    post.get().getUrlMidia(),
-                    post.get().getMomentoPublicacao(),
-                    post.get().getConteudo(),
-                    post.get().getQtdLike(),
-                    post.get().getTagRelatorio()
-            )));
+                    perfilOptional.get().getUrlFotoPerfil(),
+                    perfilOptional.get().getSobre()
+            );
         }
 
         return null;

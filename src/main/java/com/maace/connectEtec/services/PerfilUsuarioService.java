@@ -146,11 +146,9 @@ public class PerfilUsuarioService {
         for (UUID idGrupo : idGrupos) {
             Optional<GrupoModel> grupo = grupoRepository.findById(idGrupo);
 
-            String nome = grupo.get().getNome();
-
             String urlFotoDePerfil = perfilGrupoRepository.findById(grupo.get().getIdGrupo()).get().getUrlFotoPerfil();
 
-            grupos.add(new RespostaPerfilGrupoDto(nome, urlFotoDePerfil));
+            grupos.add(new RespostaPerfilGrupoDto(idGrupo.toString(), grupo.get().getNome(), urlFotoDePerfil));
         }
         return grupos;
     }

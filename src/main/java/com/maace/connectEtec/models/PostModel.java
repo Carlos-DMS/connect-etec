@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -23,7 +24,7 @@ public class PostModel implements Serializable {
     private String conteudo;
     private Integer qtdLike = 0;
     private EnumTag tag;
-    private List<UUID> idRespostas;
+    private List<UUID> idRespostas = new ArrayList<>();
     private UUID idGrupo;
 
     public UUID getIdPost() {

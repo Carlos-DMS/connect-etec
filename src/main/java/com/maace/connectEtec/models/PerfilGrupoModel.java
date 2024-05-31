@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 
 import java.io.Serial;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.UUID;
 
@@ -18,7 +19,7 @@ public class PerfilGrupoModel implements Serializable {
     protected UUID idPerfil;
     protected String urlFotoPerfil;
     protected String sobre;
-    protected List<UUID> idPosts;
+    protected List<UUID> idPosts = new ArrayList<>();
 
     public UUID getIdPerfil() {
         return idPerfil;
