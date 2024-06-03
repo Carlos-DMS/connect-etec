@@ -1,6 +1,5 @@
 package com.maace.connectEtec.dtos.post;
 
-import java.time.LocalDateTime;
 import java.util.UUID;
 
 public record RespostaPostDto(
@@ -10,8 +9,9 @@ public record RespostaPostDto(
         String nomeGrupo,
         String urlFotoPerfilGrupo,
         String urlMidia,
-        LocalDateTime momentoPublicacao,
         String conteudo,
+        String momento,
         Integer qtdLike,
+        Boolean postCurtido,
         String tag
 ) { }

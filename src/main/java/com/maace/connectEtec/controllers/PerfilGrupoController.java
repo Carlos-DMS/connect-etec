@@ -51,8 +51,9 @@ public class PerfilGrupoController {
     }
 
     @PostMapping("/buscarPosts")
-    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestBody @Valid IdGrupoDto idGrupo){
-        List<Optional<RespostaPostDto>> postDto = perfilGrupoService.buscarPosts(idGrupo);
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdGrupoDto idGrupo){
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+        List<Optional<RespostaPostDto>> postDto = perfilGrupoService.buscarPosts(idGrupo, usuario.getLogin());
 
         if(postDto != null || !postDto.isEmpty()){
             return ResponseEntity.status(HttpStatus.OK).body(postDto);

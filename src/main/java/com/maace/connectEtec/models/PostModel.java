@@ -5,12 +5,12 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.UUID;
 
 @Entity
-@Table(name="tb_post")
+@Table(name = "tb_post")
 public class PostModel implements Serializable {
     @Serial
     private static final long serialVersionUID = 1L;
@@ -24,7 +24,7 @@ public class PostModel implements Serializable {
     private String conteudo;
     private Integer qtdLike = 0;
     private EnumTag tag;
-    private List<UUID> idRespostas = new ArrayList<>();
+    private List<UUID> idRespostas;
     private UUID idGrupo;
 
     public UUID getIdPost() {
@@ -33,6 +33,11 @@ public class PostModel implements Serializable {
 
     public LocalDateTime getMomentoPublicacao() {
         return momentoPublicacao;
+    }
+
+    public String momentoFormatado() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
+        return momentoPublicacao.format(formato);
     }
 
     public String getLoginAutor() {
@@ -63,11 +68,11 @@ public class PostModel implements Serializable {
         return qtdLike;
     }
 
-    public void darLike() {
+    public void curtir() {
         this.qtdLike += 1;
     }
 
-    public void removerLike() {
+    public void removerCurtida() {
         this.qtdLike -= 1;
     }
 

@@ -85,8 +85,8 @@ public class PerfilUsuarioService {
         return null;
     }
 
-    public List<Optional<RespostaPostDto>> buscarPosts(String loginUsuario) {
-        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(loginUsuario);
+    public List<Optional<RespostaPostDto>> buscarPosts(String login) {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(login);
 
         List<UUID> idPosts = perfilUsuario.get().getIdPosts();
 
@@ -98,25 +98,28 @@ public class PerfilUsuarioService {
 
             Optional<PostModel> post = postRepository.findById(idPost);
 
-            UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+            if (post.isPresent()) {
+                UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
 
-            if (post.get().getIdGrupo() != null) {
-                grupo = grupoRepository.findById(post.get().getIdGrupo());
-                perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                if (post.get().getIdGrupo() != null) {
+                    grupo = grupoRepository.findById(post.get().getIdGrupo());
+                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                }
+
+                posts.add(Optional.of(new RespostaPostDto(
+                        post.get().getIdPost(),
+                        selecionarNomeExibido(usuario),
+                        perfilUsuario.get().getUrlFotoPerfil(),
+                        (grupo.isPresent()) ? grupo.get().getNome() : null,
+                        (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                        post.get().getUrlMidia(),
+                        post.get().getConteudo(),
+                        post.get().momentoFormatado(),
+                        post.get().getQtdLike(),
+                        postCurtidoPeloUsuario(login, post.get().getIdPost()),
+                        post.get().getTagRelatorio()
+                )));
             }
-            
-            posts.add(Optional.of(new RespostaPostDto(
-                    post.get().getIdPost(),
-                    selecionarNomeExibido(usuario),
-                    perfilUsuario.get().getUrlFotoPerfil(),
-                    (grupo.isPresent()) ? grupo.get().getNome() : null,
-                    (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
-                    post.get().getUrlMidia(),
-                    post.get().getMomentoPublicacao(),
-                    post.get().getConteudo(),
-                    post.get().getQtdLike(),
-                    post.get().getTagRelatorio()
-            )));
         }
         Collections.reverse(posts);
 
@@ -179,5 +182,15 @@ public class PerfilUsuarioService {
         }
 
         return nome;
+    }
+
+    public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        if (perfil.isPresent()){
+            return perfil.get().getIdPostsCurtidos().contains(idPost);
+        }
+        return null;
     }
 }
