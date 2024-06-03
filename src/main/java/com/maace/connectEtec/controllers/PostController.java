@@ -3,6 +3,7 @@ package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.post.CriarPostDto;
 import com.maace.connectEtec.dtos.post.CurtirPostDto;
+import com.maace.connectEtec.dtos.post.IdPostDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PostService;
@@ -59,5 +60,21 @@ public class PostController {
             return ResponseEntity.status(HttpStatus.OK).body(estadoLike);
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+
+    @DeleteMapping()
+    public ResponseEntity deletarPost(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdPostDto idPostDto) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean resposta = postService.deletarPost(usuario, UUID.fromString(idPostDto.idPost()));
+
+        if (resposta != null) {
+            if (resposta) {
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

@@ -70,7 +70,7 @@ public class PostService {
 
             if (post.getIdGrupo() != null) {
                 grupo = grupoRepository.findById(post.getIdGrupo());
-                if (grupo.isPresent()){
+                if (grupo.isPresent()) {
                     perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
                 }
             }
@@ -107,8 +107,7 @@ public class PostService {
                 perfilUsuarioRepository.save(perfil.get());
 
                 return true;
-            }
-            else {
+            } else {
                 post.get().removerCurtida();
                 perfil.get().removerCurtidaPost(idPost);
 
@@ -117,16 +116,47 @@ public class PostService {
 
                 return false;
             }
-
         }
         return null;
     }
+
+
+    public Boolean deletarPost(UsuarioModel usuario, UUID idPost) {
+        Optional<PostModel> post = postRepository.findById(idPost);
+
+        if (post.isPresent()) {
+            UUID idGrupo = post.get().getIdGrupo();
+
+            if (usuario.getLogin().equals(post.get().getLoginAutor()) ||
+                    usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR)
+            {
+                postRepository.delete(post.get());
+                return true;
+            }
+
+            if (idGrupo != null) {
+                Optional<GrupoModel> grupo = grupoRepository.findById(idGrupo);
+
+                if (grupo.isPresent()) {
+                    if (usuario.getLogin().equals(grupo.get().getLoginDono()) ||
+                            grupo.get().getLoginModeradores().contains(usuario.getLogin()))
+                    {
+                        postRepository.delete(post.get());
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+        return null;
+    }
+
 
     public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
 
-        if (perfil.isPresent()){
+        if (perfil.isPresent()) {
             return perfil.get().getIdPostsCurtidos().contains(idPost);
         }
         return null;
