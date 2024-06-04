@@ -5,6 +5,7 @@ import jakarta.persistence.*;
 import java.io.Serial;
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.UUID;
 
 @Entity
@@ -20,7 +21,7 @@ public class ComentarioModel implements Serializable {
     private String urlMidia;
     private final LocalDateTime momentoPublicacao = LocalDateTime.now();
     private String conteudo;
-    private Integer qtdLike;
+    private Integer qtdLike = 0;
 
     public UUID getIdComentario() {
         return idComentario;
@@ -30,12 +31,17 @@ public class ComentarioModel implements Serializable {
         return momentoPublicacao;
     }
 
+    public String momentoFormatado() {
+        DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
+        return momentoPublicacao.format(formato);
+    }
+
     public String getLoginAutor() {
         return loginAutor;
     }
 
-    public void setLoginAutor(UsuarioModel usuario) {
-        this.loginAutor = usuario.getLogin();
+    public void setLoginAutor(String usuario) {
+        this.loginAutor = usuario;
     }
 
     public String getUrlMidia() {
@@ -58,7 +64,11 @@ public class ComentarioModel implements Serializable {
         return qtdLike;
     }
 
-    public void setQtdLike(Integer qtdLike) {
-        this.qtdLike = qtdLike;
+    public void curtir() {
+        this.qtdLike += 1;
+    }
+
+    public void removerCurtida() {
+        this.qtdLike -= 1;
     }
 }

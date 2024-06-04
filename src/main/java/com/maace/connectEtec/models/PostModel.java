@@ -24,7 +24,10 @@ public class PostModel implements Serializable {
     private String conteudo;
     private Integer qtdLike = 0;
     private EnumTag tag;
-    private List<UUID> idRespostas;
+    @ElementCollection
+    @CollectionTable(name = "tb_post_comentarios", joinColumns = @JoinColumn(name = "post_id"))
+    @Column(name = "comentario_id")
+    private List<UUID> idComentarios;
     private UUID idGrupo;
 
     public UUID getIdPost() {
@@ -88,8 +91,16 @@ public class PostModel implements Serializable {
         return tag.getTag();
     }
 
-    public List<UUID> getIdRespostas() {
-        return idRespostas;
+    public void adicionarComentario(UUID idComentario) {
+        idComentarios.add(idComentario);
+    }
+
+    public void removerComentario(UUID idComentario) {
+        idComentarios.remove(idComentario);
+    }
+
+    public List<UUID> getIdComentarios() {
+        return idComentarios;
     }
 
     public UUID getIdGrupo() {

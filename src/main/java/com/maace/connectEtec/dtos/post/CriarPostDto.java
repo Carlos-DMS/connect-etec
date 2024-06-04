@@ -8,4 +8,4 @@ public record CriarPostDto(
         @NullableNotBlank String conteudo,
         @NullableNotBlank String idGrupo,
         @NotNull String tag
-) { }
+) {}

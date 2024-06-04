@@ -28,18 +28,22 @@ public class PostController {
     @Autowired
     UsuarioService usuarioService;
 
-    @PostMapping("/criar")
+    @PostMapping
     public ResponseEntity criar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CriarPostDto criarPostDto) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if (usuario != null) {
-            postService.criar(criarPostDto, usuario);
-            return ResponseEntity.status(HttpStatus.CREATED).build();
+            Boolean resultado = postService.criar(criarPostDto, usuario);
+
+            if (resultado) {
+                return ResponseEntity.status(HttpStatus.CREATED).build();
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @GetMapping()
+    @GetMapping
     public ResponseEntity<List<Optional<RespostaPostDto>>> listarTodos(@RequestHeader("Authorization") String authorizationHeader) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
         List<Optional<RespostaPostDto>> respostaPostDtos = postService.listarPosts(usuario);
@@ -63,7 +67,7 @@ public class PostController {
     }
 
 
-    @DeleteMapping()
+    @DeleteMapping
     public ResponseEntity deletarPost(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdPostDto idPostDto) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 

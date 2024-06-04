@@ -29,29 +29,34 @@ public class PostService {
     @Autowired
     UsuarioRepository usuarioRepository;
 
-    public void criar(CriarPostDto criarPostDto, UsuarioModel usuario) {
+    public Boolean criar(CriarPostDto criarPostDto, UsuarioModel usuario) {
         PostModel post = new PostModel();
 
-        post.setLoginAutor(usuario.getLogin());
-        post.setConteudo(criarPostDto.conteudo());
-        post.setUrlMidia(criarPostDto.urlMidia());
-        post.setTag(criarPostDto.tag());
+        if (criarPostDto.conteudo() != null || criarPostDto.urlMidia() != null) {
+            post.setLoginAutor(usuario.getLogin());
+            post.setConteudo(criarPostDto.conteudo());
+            post.setUrlMidia(criarPostDto.urlMidia());
+            post.setTag(criarPostDto.tag());
 
-        if (criarPostDto.idGrupo() != null) {
-            post.setIdGrupo(UUID.fromString(criarPostDto.idGrupo()));
-        } else {
-            post.setIdGrupo(null);
+            if (criarPostDto.idGrupo() != null) {
+                post.setIdGrupo(UUID.fromString(criarPostDto.idGrupo()));
+            } else {
+                post.setIdGrupo(null);
+            }
+
+            postRepository.save(post);
+
+            UUID id = post.getIdPost();
+
+            Optional<PerfilUsuarioModel> perfil = perfilUsuarioService.buscarPerfil(usuario.getLogin());
+
+            perfil.get().addIdPost(id);
+
+            perfilUsuarioRepository.save(perfil.get());
+
+            return true;
         }
-
-        postRepository.save(post);
-
-        UUID id = post.getIdPost();
-
-        Optional<PerfilUsuarioModel> perfil = perfilUsuarioService.buscarPerfil(usuario.getLogin());
-
-        perfil.get().addIdPost(id);
-
-        perfilUsuarioRepository.save(perfil.get());
+        return false;
     }
 
     public List<Optional<RespostaPostDto>> listarPosts(UsuarioModel usuario) {
