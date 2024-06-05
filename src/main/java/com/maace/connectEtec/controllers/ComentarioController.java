@@ -2,7 +2,6 @@ package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.comentario.CriarComentarioDto;
 import com.maace.connectEtec.dtos.comentario.RespostaComentarioDto;
-import com.maace.connectEtec.dtos.post.IdPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.ComentarioService;
 import com.maace.connectEtec.services.UsuarioService;
@@ -42,15 +41,15 @@ public class ComentarioController {
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
-    @PostMapping("/listar")
+    @GetMapping
     public ResponseEntity<List<RespostaComentarioDto>> listarComentarios
             (@RequestHeader("Authorization") String authorizationHeader,
-             @RequestBody @Valid IdPostDto idPostDto)
+             @RequestParam(name = "idPost") String idPost)
     {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if (usuario != null) {
-            List<RespostaComentarioDto> comentarios = comentarioService.listarComentarios(usuario, UUID.fromString(idPostDto.idPost()));
+            List<RespostaComentarioDto> comentarios = comentarioService.listarComentarios(usuario, UUID.fromString(idPost));
 
             if (!comentarios.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.OK).body(comentarios);

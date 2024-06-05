@@ -3,7 +3,6 @@ package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.post.CriarPostDto;
 import com.maace.connectEtec.dtos.post.CurtirPostDto;
-import com.maace.connectEtec.dtos.post.IdPostDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PostService;
@@ -68,10 +67,10 @@ public class PostController {
 
 
     @DeleteMapping
-    public ResponseEntity deletarPost(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid IdPostDto idPostDto) {
+    public ResponseEntity deletarPost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam(name = "idPost") String idPost) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        Boolean resposta = postService.deletarPost(usuario, UUID.fromString(idPostDto.idPost()));
+        Boolean resposta = postService.deletarPost(usuario, UUID.fromString(idPost));
 
         if (resposta != null) {
             if (resposta) {
