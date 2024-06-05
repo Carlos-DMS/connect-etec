@@ -92,6 +92,35 @@ public class ComentarioService {
         return null;
     }
 
+    public Boolean curtir(String login, UUID idComentario, boolean estaCurtido) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        Optional<ComentarioModel> comentario = comentarioRepository.findById(idComentario);
+
+        if (comentario.isPresent() && perfil.isPresent()) {
+            if (!estaCurtido) {
+                comentario.get().curtir();
+                perfil.get().curtirComentario(idComentario);
+
+                comentarioRepository.save(comentario.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return true;
+            }
+            else {
+                comentario.get().removerCurtida();
+                perfil.get().removerCurtidaComentario(idComentario);
+
+                comentarioRepository.save(comentario.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return false;
+            }
+        }
+        return null;
+    }
+
     public Boolean comentarioCurtidoPeloUsuario(String login, UUID idComentario) {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());

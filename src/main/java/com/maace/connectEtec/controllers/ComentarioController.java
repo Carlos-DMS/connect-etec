@@ -1,6 +1,7 @@
 package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.comentario.CriarComentarioDto;
+import com.maace.connectEtec.dtos.comentario.CurtirComentarioDto;
 import com.maace.connectEtec.dtos.comentario.RespostaComentarioDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.ComentarioService;
@@ -44,7 +45,7 @@ public class ComentarioController {
     @GetMapping
     public ResponseEntity<List<RespostaComentarioDto>> listarComentarios
             (@RequestHeader("Authorization") String authorizationHeader,
-             @RequestParam(name = "idPost") String idPost)
+             @RequestParam(name = "idPost", required = true) String idPost)
     {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
@@ -57,5 +58,23 @@ public class ComentarioController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @PatchMapping("/curtir")
+    public ResponseEntity curtir (@RequestHeader("Authorization") String authorizationHeader,
+                                  @RequestBody @Valid CurtirComentarioDto curtirComentarioDto)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean estadoLike = comentarioService.curtir(
+                usuario.getLogin(),
+                UUID.fromString(curtirComentarioDto.idComentario()),
+                curtirComentarioDto.estaCurtido()
+        );
+
+        if (estadoLike != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(estadoLike);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

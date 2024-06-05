@@ -54,7 +54,10 @@ public class PostController {
     }
 
     @PatchMapping("/curtir")
-    public ResponseEntity<Boolean> curtirPost(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CurtirPostDto curtirPostDto) {
+    public ResponseEntity<Boolean> curtirPost(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid CurtirPostDto curtirPostDto)
+    {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         Boolean estadoLike = postService.curtir(usuario.getLogin(), UUID.fromString(curtirPostDto.idPost()), curtirPostDto.estaCurtido());
@@ -67,7 +70,9 @@ public class PostController {
 
 
     @DeleteMapping
-    public ResponseEntity deletarPost(@RequestHeader("Authorization") String authorizationHeader, @RequestParam(name = "idPost") String idPost) {
+    public ResponseEntity deletarPost(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "idPost", required = true) String idPost) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         Boolean resposta = postService.deletarPost(usuario, UUID.fromString(idPost));
