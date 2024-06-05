@@ -77,4 +77,28 @@ public class ComentarioController {
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @DeleteMapping
+    public ResponseEntity deletarComentario(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "idPost", required = true) String idPost,
+            @RequestParam(name = "idComentario", required = true) String idComentario)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean resposta = comentarioService.deletarComentario(
+                usuario,
+                UUID.fromString(idPost),
+                UUID.fromString(idComentario)
+        );
+
+        if (resposta != null) {
+            if (resposta) {
+                return ResponseEntity.status(HttpStatus.OK).build();
+            }
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
+    }
 }
+

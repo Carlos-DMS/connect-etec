@@ -2,14 +2,8 @@ package com.maace.connectEtec.services;
 
 import com.maace.connectEtec.dtos.comentario.CriarComentarioDto;
 import com.maace.connectEtec.dtos.comentario.RespostaComentarioDto;
-import com.maace.connectEtec.models.ComentarioModel;
-import com.maace.connectEtec.models.PerfilUsuarioModel;
-import com.maace.connectEtec.models.PostModel;
-import com.maace.connectEtec.models.UsuarioModel;
-import com.maace.connectEtec.repositories.ComentarioRepository;
-import com.maace.connectEtec.repositories.PerfilUsuarioRepository;
-import com.maace.connectEtec.repositories.PostRepository;
-import com.maace.connectEtec.repositories.UsuarioRepository;
+import com.maace.connectEtec.models.*;
+import com.maace.connectEtec.repositories.*;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -29,6 +23,9 @@ public class ComentarioService {
 
     @Autowired
     PerfilUsuarioRepository perfilUsuarioRepository;
+
+    @Autowired
+    GrupoRepository grupoRepository;
 
     @Autowired
     PerfilUsuarioService perfilUsuarioService;
@@ -117,6 +114,38 @@ public class ComentarioService {
 
                 return false;
             }
+        }
+        return null;
+    }
+
+    public Boolean deletarComentario(UsuarioModel usuario, UUID idPost, UUID idComentario) {
+        Optional<PostModel> post = postRepository.findById(idPost);
+        Optional<ComentarioModel> comentario = comentarioRepository.findById(idComentario);
+
+        if (post.isPresent() && comentario.isPresent()) {
+            UUID idGrupo = post.get().getIdGrupo();
+
+            if (usuario.getLogin().equals(post.get().getLoginAutor()) ||
+                    usuario.getLogin().equals(comentario.get().getLoginAutor()) ||
+                    usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR)
+            {
+                comentarioRepository.delete(comentario.get());
+                return true;
+            }
+
+            if (idGrupo != null) {
+                Optional<GrupoModel> grupo = grupoRepository.findById(idGrupo);
+
+                if (grupo.isPresent()) {
+                    if (usuario.getLogin().equals(grupo.get().getLoginDono()) ||
+                            grupo.get().getLoginModeradores().contains(usuario.getLogin()))
+                    {
+                        comentarioRepository.delete(comentario.get());
+                        return true;
+                    }
+                }
+            }
+            return false;
         }
         return null;
     }

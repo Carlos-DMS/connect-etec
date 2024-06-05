@@ -72,7 +72,8 @@ public class PostController {
     @DeleteMapping
     public ResponseEntity deletarPost(
             @RequestHeader("Authorization") String authorizationHeader,
-            @RequestParam(name = "idPost", required = true) String idPost) {
+            @RequestParam(name = "idPost", required = true) String idPost)
+    {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         Boolean resposta = postService.deletarPost(usuario, UUID.fromString(idPost));
