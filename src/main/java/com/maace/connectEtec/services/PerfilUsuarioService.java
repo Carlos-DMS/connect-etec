@@ -55,7 +55,7 @@ public class PerfilUsuarioService {
         perfilUsuarioRepository.save(perfil.get());
     }
 
-    public List<Optional<RespostaPerfilUsuarioDto>> listarPerfis(){
+    public List<Optional<RespostaPerfilUsuarioDto>> listarPerfis(UsuarioModel usuarioLogado){
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
         List<Optional<RespostaPerfilUsuarioDto>> perfis = new ArrayList<>();
 
@@ -64,7 +64,17 @@ public class PerfilUsuarioService {
 
             Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(idPerfilUsuario);
 
-            perfis.add(Optional.of(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil(), usuario.getLogin())));
+            if (perfil.get().getIdPerfil() != usuarioLogado.getIdPerfilUsuario()) {
+                perfis.add(Optional.of(new RespostaPerfilUsuarioDto
+                                (selecionarNomeExibido(usuario),
+                                        perfil.get().getUrlFotoPerfil(),
+                                        usuario.getLogin(),
+                                        perfilSeguidoPeloUsuarioLogado(
+                                                usuarioLogado,
+                                                usuario.getLogin()
+                                        )))
+                );
+            }
         }
         return perfis;
     }
@@ -126,26 +136,6 @@ public class PerfilUsuarioService {
         return posts;
     }
 
-    public List<RespostaPerfilUsuarioDto> buscarConexoes(String loginUsuario) {
-        Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
-
-        List<String> loginConexoes = perfil.get().getLoginConexoes();
-
-        List<RespostaPerfilUsuarioDto> conexoes = new ArrayList<>();
-
-        if (loginConexoes != null) {
-            for (String loginConexao : loginConexoes) {
-                UsuarioModel usuario = usuarioRepository.findByLogin(loginConexao);
-
-                Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(usuario.getLogin());
-
-                conexoes.add(new RespostaPerfilUsuarioDto(selecionarNomeExibido(usuario), perfil.get().getUrlFotoPerfil(), usuario.getLogin()));
-            }
-            return conexoes;
-        }
-        return null;
-    }
-
     public List<RespostaPerfilGrupoDto> buscarGrupos (String loginUsuario) {
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
 
@@ -171,6 +161,34 @@ public class PerfilUsuarioService {
         return perfilUsuarioRepository.findById(idPerfilUsuario);
     }
 
+    public Boolean seguirUsuario (String loginUsuario,
+                                  String loginUsuarioSeguido,
+                                  boolean estaSeguido)
+    {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(loginUsuario);
+        Optional<PerfilUsuarioModel> perfilUsuarioSeguido = buscarPerfil(loginUsuarioSeguido);
+
+        if (perfilUsuario.isPresent() && perfilUsuarioSeguido.isPresent()) {
+            if (!estaSeguido) {
+                perfilUsuario.get().adicionarLoginUsuarioSeguido(loginUsuarioSeguido);
+                perfilUsuarioSeguido.get().adicionarLoginSeguidor(loginUsuario);
+
+                perfilUsuarioRepository.save(perfilUsuario.get());
+                perfilUsuarioRepository.save(perfilUsuarioSeguido.get());
+
+                return true;
+            }
+            perfilUsuario.get().removerLoginUsuarioSeguido(loginUsuarioSeguido);
+            perfilUsuarioSeguido.get().removerLoginSeguidor(loginUsuario);
+
+            perfilUsuarioRepository.save(perfilUsuario.get());
+            perfilUsuarioRepository.save(perfilUsuarioSeguido.get());
+
+            return false;
+        }
+        return null;
+    }
+
     public String selecionarNomeExibido(UsuarioModel usuario) {
         String nome;
 
@@ -180,7 +198,6 @@ public class PerfilUsuarioService {
         else{
             nome = usuario.getNomeCompleto();
         }
-
         return nome;
     }
 
@@ -190,6 +207,15 @@ public class PerfilUsuarioService {
 
         if (perfil.isPresent()){
             return perfil.get().getIdPostsCurtidos().contains(idPost);
+        }
+        return null;
+    }
+
+    public Boolean perfilSeguidoPeloUsuarioLogado(UsuarioModel usuario, String loginPerfil) {
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        if (perfil.isPresent()) {
+            return perfil.get().getLoginUsuariosSeguidos().contains(loginPerfil);
         }
         return null;
     }

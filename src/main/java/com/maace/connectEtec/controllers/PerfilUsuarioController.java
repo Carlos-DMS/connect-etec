@@ -1,10 +1,7 @@
 package com.maace.connectEtec.controllers;
 
-import com.maace.connectEtec.dtos.perfilUsuario.EditarFotoPerfilDto;
+import com.maace.connectEtec.dtos.perfilUsuario.*;
 import com.maace.connectEtec.dtos.usuario.BuscarUsuarioDto;
-import com.maace.connectEtec.dtos.perfilUsuario.EditarPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.perfilUsuario.AcessarPerfilUsuarioDto;
-import com.maace.connectEtec.dtos.perfilUsuario.RespostaPerfilUsuarioDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PerfilUsuarioService;
@@ -52,14 +49,19 @@ public class PerfilUsuarioController {
         return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
-    @GetMapping("/listarTodos")
-    public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listarTodos() {
-        List<Optional<RespostaPerfilUsuarioDto>> perfis = perfilUsuarioService.listarPerfis();
+    @GetMapping
+    public ResponseEntity<List<Optional<RespostaPerfilUsuarioDto>>> listarTodos(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        if (perfis != null) {
-            return ResponseEntity.status(HttpStatus.OK).body(perfis);
+        if (usuario != null) {
+            List<Optional<RespostaPerfilUsuarioDto>> perfis = perfilUsuarioService.listarPerfis(usuario);
+
+            if (perfis != null) {
+                return ResponseEntity.status(HttpStatus.OK).body(perfis);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
-        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
 
     @GetMapping("/buscarMeuPerfil")
@@ -104,5 +106,24 @@ public class PerfilUsuarioController {
             return ResponseEntity.status(HttpStatus.OK).body(posts);
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/seguir")
+    public ResponseEntity<Boolean> seguirUsuario (
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid SeguirUsuarioDto seguirUsuarioDto)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean estadoSeguir = perfilUsuarioService.seguirUsuario(
+                usuario.getLogin(),
+                seguirUsuarioDto.loginUsuarioSeguido(),
+                seguirUsuarioDto.estaSeguido()
+        );
+
+        if (estadoSeguir != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(estadoSeguir);
+        }
+        return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
 }

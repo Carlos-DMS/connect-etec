@@ -32,9 +32,13 @@ public class PerfilUsuarioModel implements Serializable {
     @Column(name = "comentario_curtido_id")
     private List<UUID> idComentariosCurtidos = new ArrayList<>();
     @ElementCollection
-    @CollectionTable(name = "tb_perfil_usuario_conexoes", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
-    @Column(name = "conexao_id")
-    private List<String> loginConexoes = new ArrayList<>();
+    @CollectionTable(name = "tb_perfil_usuario_usuarios_seguidos", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "usuario_seguido_login")
+    private List<String> loginUsuariosSeguidos = new ArrayList<>();
+    @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_seguidores", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "seguidor_login")
+    private List<String> loginSeguidores = new ArrayList<>();
     @ElementCollection
     @CollectionTable(name = "tb_perfil_usuario_grupos", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
     @Column(name = "grupo_id")
@@ -93,8 +97,36 @@ public class PerfilUsuarioModel implements Serializable {
         return idPosts;
     }
 
-    public List<String> getLoginConexoes() {
-        return loginConexoes;
+    public List<String> getLoginUsuariosSeguidos() {
+        return loginUsuariosSeguidos;
+    }
+
+    public void adicionarLoginUsuarioSeguido(String loginUsuarioSeguido) {
+        loginUsuariosSeguidos.add(loginUsuarioSeguido);
+    }
+
+    public void removerLoginUsuarioSeguido(String loginUsuarioSeguido) {
+        loginUsuariosSeguidos.remove(loginUsuarioSeguido);
+    }
+
+    public int getQtdUsuariosSeguidos() {
+        return loginUsuariosSeguidos.size();
+    }
+
+    public List<String> getLoginSeguidores() {
+        return loginSeguidores;
+    }
+
+    public void adicionarLoginSeguidor(String loginSeguidor) {
+        loginSeguidores.add(loginSeguidor);
+    }
+
+    public void removerLoginSeguidor(String loginSeguidor) {
+        loginSeguidores.remove(loginSeguidor);
+    }
+
+    public int getQtdSeguidores() {
+        return loginSeguidores.size();
     }
 
     public List<UUID> getGrupos() {
