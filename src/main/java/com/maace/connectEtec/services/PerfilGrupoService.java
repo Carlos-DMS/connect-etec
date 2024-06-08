@@ -130,7 +130,9 @@ public class PerfilGrupoService {
                             post.get().getUrlMidia(),
                             post.get().getConteudo(),
                             post.get().momentoFormatado(),
+                            usuario.getLogin(),
                             post.get().getQtdLike(),
+                            post.get().getQtdComentarios(),
                             postCurtidoPeloUsuario(login, post.get().getIdPost()),
                             post.get().getTagRelatorio()
                     )));

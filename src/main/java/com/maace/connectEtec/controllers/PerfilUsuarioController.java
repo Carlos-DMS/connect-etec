@@ -1,7 +1,6 @@
 package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.perfilUsuario.*;
-import com.maace.connectEtec.dtos.usuario.BuscarUsuarioDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PerfilUsuarioService;
@@ -77,8 +76,8 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/buscarPerfil")
-    public ResponseEntity<AcessarPerfilUsuarioDto> buscarPerfil(@RequestBody @Valid BuscarUsuarioDto usuarioDto) {
-        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(usuarioDto.login());
+    public ResponseEntity<AcessarPerfilUsuarioDto> buscarPerfil(@RequestParam(name = "loginUsuario", required = true) String loginUsuario) {
+        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(loginUsuario);
 
         if (acessarPerfilUsuarioDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);
@@ -99,8 +98,8 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/buscarPosts")
-    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestBody @Valid BuscarUsuarioDto usuarioDto) {
-        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(usuarioDto.login());
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestParam(name = "loginUsuario", required = true) String loginUsuario) {
+        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(loginUsuario);
 
         if (!posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(posts);

@@ -11,7 +11,9 @@ public record RespostaPostDto(
         String urlMidia,
         String conteudo,
         String momento,
+        String loginAutor,
         Integer qtdLike,
+        Integer qtdComentarios,
         Boolean postCurtido,
         String tag
 ) { }

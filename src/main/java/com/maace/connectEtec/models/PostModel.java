@@ -103,6 +103,10 @@ public class PostModel implements Serializable {
         return idComentarios;
     }
 
+    public int getQtdComentarios() {
+        return idComentarios.size();
+    }
+
     public UUID getIdGrupo() {
         return idGrupo;
     }
