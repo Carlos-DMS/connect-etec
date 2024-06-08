@@ -89,7 +89,7 @@ public class PostService {
                     post.getUrlMidia(),
                     post.getConteudo(),
                     post.momentoFormatado(),
-                    usuario.getLogin(),
+                    post.getLoginAutor(),
                     post.getQtdLike(),
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
