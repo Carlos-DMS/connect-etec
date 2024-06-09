@@ -98,8 +98,13 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/buscarPosts")
-    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(@RequestParam(name = "loginUsuario", required = true) String loginUsuario) {
-        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(loginUsuario);
+    public ResponseEntity<List<Optional<RespostaPostDto>>> buscarPosts(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "loginUsuario", required = true) String loginUsuario)
+    {
+        UsuarioModel usuarioLogado = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<Optional<RespostaPostDto>> posts = perfilUsuarioService.buscarPosts(loginUsuario, usuarioLogado.getLogin());
 
         if (!posts.isEmpty()) {
             return ResponseEntity.status(HttpStatus.OK).body(posts);

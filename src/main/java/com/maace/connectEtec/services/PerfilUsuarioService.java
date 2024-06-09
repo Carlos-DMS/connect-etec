@@ -55,7 +55,7 @@ public class PerfilUsuarioService {
         perfilUsuarioRepository.save(perfil.get());
     }
 
-    public List<Optional<RespostaPerfilUsuarioDto>> listarPerfis(UsuarioModel usuarioLogado){
+    public List<Optional<RespostaPerfilUsuarioDto>> listarPerfis(UsuarioModel usuarioLogado) {
         List<UsuarioModel> usuarios = usuarioRepository.findAll();
         List<Optional<RespostaPerfilUsuarioDto>> perfis = new ArrayList<>();
 
@@ -66,13 +66,13 @@ public class PerfilUsuarioService {
 
             if (perfil.get().getIdPerfil() != usuarioLogado.getIdPerfilUsuario()) {
                 perfis.add(Optional.of(new RespostaPerfilUsuarioDto
-                                (selecionarNomeExibido(usuario),
-                                        perfil.get().getUrlFotoPerfil(),
-                                        usuario.getLogin(),
-                                        perfilSeguidoPeloUsuarioLogado(
-                                                usuarioLogado,
-                                                usuario.getLogin()
-                                        )))
+                        (selecionarNomeExibido(usuario),
+                                perfil.get().getUrlFotoPerfil(),
+                                usuario.getLogin(),
+                                perfilSeguidoPeloUsuarioLogado(
+                                        usuarioLogado,
+                                        usuario.getLogin()
+                                )))
                 );
             }
         }
@@ -138,7 +138,51 @@ public class PerfilUsuarioService {
         return posts;
     }
 
-    public List<RespostaPerfilGrupoDto> buscarGrupos (String loginUsuario) {
+    //Sobrecarga para o endpoint /perfilUsuario/buscarPosts
+    public List<Optional<RespostaPostDto>> buscarPosts(String loginAutor, String loginUsuario) {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(loginAutor);
+
+        List<UUID> idPosts = perfilUsuario.get().getIdPosts();
+
+        List<Optional<RespostaPostDto>> posts = new ArrayList<>();
+
+        for (UUID idPost : idPosts) {
+            Optional<GrupoModel> grupo = Optional.empty();
+            Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
+
+            Optional<PostModel> post = postRepository.findById(idPost);
+
+            if (post.isPresent()) {
+                UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+
+                if (post.get().getIdGrupo() != null) {
+                    grupo = grupoRepository.findById(post.get().getIdGrupo());
+                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                }
+
+                posts.add(Optional.of(new RespostaPostDto(
+                        post.get().getIdPost(),
+                        selecionarNomeExibido(usuario),
+                        perfilUsuario.get().getUrlFotoPerfil(),
+                        (grupo.isPresent()) ? grupo.get().getNome() : null,
+                        (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                        post.get().getUrlMidia(),
+                        post.get().getConteudo(),
+                        post.get().momentoFormatado(),
+                        usuario.getLogin(),
+                        post.get().getQtdLike(),
+                        post.get().getQtdComentarios(),
+                        postCurtidoPeloUsuario(loginUsuario, post.get().getIdPost()),
+                        post.get().getTagRelatorio()
+                )));
+            }
+        }
+        Collections.reverse(posts);
+
+        return posts;
+    }
+
+    public List<RespostaPerfilGrupoDto> buscarGrupos(String loginUsuario) {
         Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
 
         List<UUID> idGrupos = perfil.get().getGrupos();
@@ -155,7 +199,7 @@ public class PerfilUsuarioService {
         return grupos;
     }
 
-    public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario){
+    public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario) {
         UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
 
         UUID idPerfilUsuario = usuario.getIdPerfilUsuario();
@@ -163,10 +207,9 @@ public class PerfilUsuarioService {
         return perfilUsuarioRepository.findById(idPerfilUsuario);
     }
 
-    public Boolean seguirUsuario (String loginUsuario,
-                                  String loginUsuarioSeguido,
-                                  boolean estaSeguido)
-    {
+    public Boolean seguirUsuario(String loginUsuario,
+                                 String loginUsuarioSeguido,
+                                 boolean estaSeguido) {
         Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(loginUsuario);
         Optional<PerfilUsuarioModel> perfilUsuarioSeguido = buscarPerfil(loginUsuarioSeguido);
 
@@ -196,8 +239,7 @@ public class PerfilUsuarioService {
 
         if (usuario.getNomeSocial() != null) {
             nome = usuario.getNomeSocial();
-        }
-        else{
+        } else {
             nome = usuario.getNomeCompleto();
         }
         return nome;
@@ -207,7 +249,7 @@ public class PerfilUsuarioService {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
 
-        if (perfil.isPresent()){
+        if (perfil.isPresent()) {
             return perfil.get().getIdPostsCurtidos().contains(idPost);
         }
         return null;
@@ -221,4 +263,12 @@ public class PerfilUsuarioService {
         }
         return null;
     }
+
+//    public List<RespostaPerfilUsuarioDto> listarUsuariosSeguidos(UsuarioModel usuario) {
+//
+//    }
+//
+//    public List<RespostaPerfilUsuarioDto> listarSeguidores() {
+//
+//    }
 }
