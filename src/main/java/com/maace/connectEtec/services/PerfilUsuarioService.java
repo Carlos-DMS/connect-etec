@@ -266,8 +266,7 @@ public class PerfilUsuarioService {
                             selecionarNomeExibido(usuarioSeguido),
                             perfilUsuarioSeguido.get().getUrlFotoPerfil(),
                             usuarioSeguido.getLogin(),
-                            !usuarioSeguido.equals(usuarioLogado) ?
-                                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuarioSeguido.getLogin()) : null
+                            perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuarioSeguido.getLogin())
                     ));
                 }
             }
@@ -316,8 +315,7 @@ public class PerfilUsuarioService {
                             selecionarNomeExibido(seguidor),
                             perfilSeguidor.get().getUrlFotoPerfil(),
                             seguidor.getLogin(),
-                            !usuarioLogado.equals(seguidor) ?
-                                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, seguidor.getLogin()) : null
+                            perfilSeguidoPeloUsuarioLogado(usuarioLogado, seguidor.getLogin())
                     ));
                 }
             }
@@ -348,7 +346,7 @@ public class PerfilUsuarioService {
     public Boolean perfilSeguidoPeloUsuarioLogado(UsuarioModel usuarioLogado, String loginPerfil) {
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuarioLogado.getIdPerfilUsuario());
 
-        if (perfil.isPresent()) {
+        if (perfil.isPresent() && !usuarioLogado.getLogin().equals(loginPerfil)) {
             return perfil.get().getLoginUsuariosSeguidos().contains(loginPerfil);
         }
         return null;
