@@ -199,14 +199,6 @@ public class PerfilUsuarioService {
         return grupos;
     }
 
-    public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario) {
-        UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
-
-        UUID idPerfilUsuario = usuario.getIdPerfilUsuario();
-
-        return perfilUsuarioRepository.findById(idPerfilUsuario);
-    }
-
     public Boolean seguirUsuario(String loginUsuario,
                                  String loginUsuarioSeguido,
                                  boolean estaSeguido) {
@@ -234,6 +226,114 @@ public class PerfilUsuarioService {
         return null;
     }
 
+    public List<RespostaPerfilUsuarioDto> listarUsuariosSeguidos(UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(usuario.getLogin());
+
+        List<RespostaPerfilUsuarioDto> usuariosSeguidos = new ArrayList<>();
+
+        if (perfilUsuario.isPresent()) {
+            for (String loginUsuarioSeguido : perfilUsuario.get().getLoginUsuariosSeguidos()) {
+                UsuarioModel usuarioSeguido = usuarioRepository.findByLogin(loginUsuarioSeguido);
+                Optional<PerfilUsuarioModel> perfilUsuarioSeguido = perfilUsuarioRepository.findById(usuarioSeguido.getIdPerfilUsuario());
+
+                if (perfilUsuarioSeguido.isPresent()) {
+                    usuariosSeguidos.add(new RespostaPerfilUsuarioDto(
+                            selecionarNomeExibido(usuarioSeguido),
+                            perfilUsuarioSeguido.get().getUrlFotoPerfil(),
+                            usuarioSeguido.getLogin(),
+                            perfilSeguidoPeloUsuarioLogado(usuario, usuarioSeguido.getLogin())
+                    ));
+                }
+            }
+            return usuariosSeguidos;
+        }
+        return null;
+    }
+
+    //Sobrecarga /perfilUsuario/usuariosSeguidos
+    public List<RespostaPerfilUsuarioDto> listarUsuariosSeguidos(UsuarioModel usuarioLogado, String loginUsuarioPesquisado) {
+        Optional<PerfilUsuarioModel> perfilUsuarioPesquisado = buscarPerfil(loginUsuarioPesquisado);
+
+        List<RespostaPerfilUsuarioDto> usuariosSeguidos = new ArrayList<>();
+
+        if (perfilUsuarioPesquisado.isPresent()) {
+            for (String loginUsuarioSeguido : perfilUsuarioPesquisado.get().getLoginUsuariosSeguidos()) {
+                UsuarioModel usuarioSeguido = usuarioRepository.findByLogin(loginUsuarioSeguido);
+                Optional<PerfilUsuarioModel> perfilUsuarioSeguido = perfilUsuarioRepository.findById(usuarioSeguido.getIdPerfilUsuario());
+
+                if (perfilUsuarioSeguido.isPresent()) {
+                    usuariosSeguidos.add(new RespostaPerfilUsuarioDto(
+                            selecionarNomeExibido(usuarioSeguido),
+                            perfilUsuarioSeguido.get().getUrlFotoPerfil(),
+                            usuarioSeguido.getLogin(),
+                            !usuarioSeguido.equals(usuarioLogado) ?
+                                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuarioSeguido.getLogin()) : null
+                    ));
+                }
+            }
+            return usuariosSeguidos;
+        }
+        return null;
+    }
+
+    public List<RespostaPerfilUsuarioDto> listarSeguidores(UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfilUsuario = buscarPerfil(usuario.getLogin());
+
+        List<RespostaPerfilUsuarioDto> seguidores = new ArrayList<>();
+
+        if (perfilUsuario.isPresent()) {
+            for (String loginUsuarioSeguido : perfilUsuario.get().getLoginSeguidores()) {
+                UsuarioModel seguidor = usuarioRepository.findByLogin(loginUsuarioSeguido);
+                Optional<PerfilUsuarioModel> perfilSeguidor = perfilUsuarioRepository.findById(seguidor.getIdPerfilUsuario());
+
+                if (perfilSeguidor.isPresent()) {
+                    seguidores.add(new RespostaPerfilUsuarioDto(
+                            selecionarNomeExibido(seguidor),
+                            perfilSeguidor.get().getUrlFotoPerfil(),
+                            seguidor.getLogin(),
+                            perfilSeguidoPeloUsuarioLogado(usuario, seguidor.getLogin())
+                    ));
+                }
+            }
+            return seguidores;
+        }
+        return null;
+    }
+
+    //Sobrecarga para /perfilUsuario/seguidores
+    public List<RespostaPerfilUsuarioDto> listarSeguidores(UsuarioModel usuarioLogado, String loginUsuarioPesquisado) {
+        Optional<PerfilUsuarioModel> perfilUsuarioPesquisado = buscarPerfil(loginUsuarioPesquisado);
+
+        List<RespostaPerfilUsuarioDto> seguidores = new ArrayList<>();
+
+        if (perfilUsuarioPesquisado.isPresent()) {
+            for (String loginUsuarioSeguido : perfilUsuarioPesquisado.get().getLoginSeguidores()) {
+                UsuarioModel seguidor = usuarioRepository.findByLogin(loginUsuarioSeguido);
+                Optional<PerfilUsuarioModel> perfilSeguidor = perfilUsuarioRepository.findById(seguidor.getIdPerfilUsuario());
+
+                if (perfilSeguidor.isPresent()) {
+                    seguidores.add(new RespostaPerfilUsuarioDto(
+                            selecionarNomeExibido(seguidor),
+                            perfilSeguidor.get().getUrlFotoPerfil(),
+                            seguidor.getLogin(),
+                            !usuarioLogado.equals(seguidor) ?
+                                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, seguidor.getLogin()) : null
+                    ));
+                }
+            }
+            return seguidores;
+        }
+        return null;
+    }
+
+    public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
+
+        UUID idPerfilUsuario = usuario.getIdPerfilUsuario();
+
+        return perfilUsuarioRepository.findById(idPerfilUsuario);
+    }
+
     public String selecionarNomeExibido(UsuarioModel usuario) {
         String nome;
 
@@ -245,6 +345,15 @@ public class PerfilUsuarioService {
         return nome;
     }
 
+    public Boolean perfilSeguidoPeloUsuarioLogado(UsuarioModel usuarioLogado, String loginPerfil) {
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuarioLogado.getIdPerfilUsuario());
+
+        if (perfil.isPresent()) {
+            return perfil.get().getLoginUsuariosSeguidos().contains(loginPerfil);
+        }
+        return null;
+    }
+
     public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
@@ -254,21 +363,4 @@ public class PerfilUsuarioService {
         }
         return null;
     }
-
-    public Boolean perfilSeguidoPeloUsuarioLogado(UsuarioModel usuario, String loginPerfil) {
-        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
-
-        if (perfil.isPresent()) {
-            return perfil.get().getLoginUsuariosSeguidos().contains(loginPerfil);
-        }
-        return null;
-    }
-
-//    public List<RespostaPerfilUsuarioDto> listarUsuariosSeguidos(UsuarioModel usuario) {
-//
-//    }
-//
-//    public List<RespostaPerfilUsuarioDto> listarSeguidores() {
-//
-//    }
 }

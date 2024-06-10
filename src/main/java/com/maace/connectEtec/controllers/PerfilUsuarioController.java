@@ -130,4 +130,76 @@ public class PerfilUsuarioController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    @GetMapping("/meusUsuariosSeguidos")
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> meusUsuariosSeguidos (@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPerfilUsuarioDto> usuariosSeguidos = perfilUsuarioService.listarUsuariosSeguidos(usuario);
+
+        if (usuariosSeguidos != null) {
+            if (!usuariosSeguidos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(usuariosSeguidos);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/usuariosSeguidos")
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> usuariosSeguidos (
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "loginUsuario", required = true) String loginUsuario)
+    {
+        UsuarioModel usuarioLogado = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPerfilUsuarioDto> usuariosSeguidos = perfilUsuarioService.listarUsuariosSeguidos(
+                usuarioLogado,
+                loginUsuario
+        );
+
+        if (usuariosSeguidos != null) {
+            if (!usuariosSeguidos.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(usuariosSeguidos);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/meusSeguidores")
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> meusSeguidores(@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPerfilUsuarioDto> seguidores = perfilUsuarioService.listarSeguidores(usuario);
+
+        if (seguidores != null) {
+            if (!seguidores.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(seguidores);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/seguidores")
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> seguidores(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "loginUsuario", required = true) String loginUsuario)
+    {
+        UsuarioModel usuarioLogado = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPerfilUsuarioDto> seguidores = perfilUsuarioService.listarSeguidores(
+                usuarioLogado,
+                loginUsuario
+        );
+
+        if (seguidores != null) {
+            if (!seguidores.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(seguidores);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 }

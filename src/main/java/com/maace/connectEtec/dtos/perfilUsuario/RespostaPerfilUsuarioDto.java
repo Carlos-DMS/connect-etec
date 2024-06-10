@@ -4,5 +4,5 @@ public record RespostaPerfilUsuarioDto(
         String nomePerfilUsuario,
         String urlFotoPerfil,
         String login,
-        boolean estaSeguido
+        Boolean estaSeguido
 ) {}
