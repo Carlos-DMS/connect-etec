@@ -129,7 +129,11 @@ public class ComentarioService {
                     usuario.getLogin().equals(comentario.get().getLoginAutor()) ||
                     usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR)
             {
+                post.get().getIdComentarios().remove(comentario.get().getIdComentario());
+                postRepository.save(post.get());
+
                 comentarioRepository.delete(comentario.get());
+
                 return true;
             }
 
@@ -140,6 +144,9 @@ public class ComentarioService {
                     if (usuario.getLogin().equals(grupo.get().getLoginDono()) ||
                             grupo.get().getLoginModeradores().contains(usuario.getLogin()))
                     {
+                        post.get().getIdComentarios().remove(comentario.get().getIdComentario());
+                        postRepository.save(post.get());
+
                         comentarioRepository.delete(comentario.get());
                         return true;
                     }
