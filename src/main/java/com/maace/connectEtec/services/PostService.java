@@ -135,8 +135,7 @@ public class PostService {
             UUID idGrupo = post.get().getIdGrupo();
 
             if (usuario.getLogin().equals(post.get().getLoginAutor()) ||
-                    usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR)
-            {
+                    usuario.getTipoUsuario() == EnumTipoUsuario.ADMINISTRADOR) {
                 postRepository.delete(post.get());
                 return true;
             }
@@ -146,8 +145,7 @@ public class PostService {
 
                 if (grupo.isPresent()) {
                     if (usuario.getLogin().equals(grupo.get().getLoginDono()) ||
-                            grupo.get().getLoginModeradores().contains(usuario.getLogin()))
-                    {
+                            grupo.get().getLoginModeradores().contains(usuario.getLogin())) {
                         postRepository.delete(post.get());
                         return true;
                     }
@@ -158,6 +156,64 @@ public class PostService {
         return null;
     }
 
+    public List<RespostaPostDto> postsUsuariosSeguidos(UsuarioModel usuario) {
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        List<PostModel> postsModel = new ArrayList<>();
+        List<RespostaPostDto> postsDTO = new ArrayList<>();
+
+        if (perfil.isPresent()) {
+            for (String loginUsuarioSeguido : perfil.get().getLoginUsuariosSeguidos()) {
+                UsuarioModel usuarioSeguido = usuarioRepository.findByLogin(loginUsuarioSeguido);
+                Optional<PerfilUsuarioModel> perfilUsuarioSeguido = perfilUsuarioRepository.findById(usuarioSeguido.getIdPerfilUsuario());
+
+                if (perfilUsuarioSeguido.isPresent()) {
+                    for (UUID idPost : perfilUsuarioSeguido.get().getIdPosts()) {
+                        Optional<PostModel> post = postRepository.findById(idPost);
+
+                        if (post.isPresent()) {
+                            postsModel.add(post.get());
+                        }
+                    }
+                }
+            }
+
+            postsModel.sort(Comparator.comparing(PostModel::getMomentoPublicacao).reversed());
+
+            for (PostModel post : postsModel) {
+                Optional<GrupoModel> grupo = Optional.empty();
+                Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
+
+                UsuarioModel usuarioSeguido = usuarioRepository.findByLogin(post.getLoginAutor());
+                Optional<PerfilUsuarioModel> perfilUsuarioSeguido = perfilUsuarioRepository.findById(usuarioSeguido.getIdPerfilUsuario());
+
+                if (post.getIdGrupo() != null) {
+                    grupo = grupoRepository.findById(post.getIdGrupo());
+                    if (grupo.isPresent()) {
+                        perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                    }
+                }
+
+                postsDTO.add(new RespostaPostDto(
+                        post.getIdPost(),
+                        perfilUsuarioService.selecionarNomeExibido(usuarioSeguido),
+                        perfilUsuarioSeguido.get().getUrlFotoPerfil(),
+                        grupo.isPresent() ? grupo.get().getNome() : null,
+                        perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                        post.getUrlMidia(),
+                        post.getConteudo(),
+                        post.momentoFormatado(),
+                        post.getLoginAutor(),
+                        post.getQtdLike(),
+                        post.getQtdComentarios(),
+                        postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                        post.getTagRelatorio()
+                ));
+            }
+        }
+
+        return postsDTO;
+    }
 
     public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
@@ -169,3 +225,5 @@ public class PostService {
         return null;
     }
 }
+
+

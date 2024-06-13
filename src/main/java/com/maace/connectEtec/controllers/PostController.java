@@ -86,4 +86,19 @@ public class PostController {
         }
         return ResponseEntity.status(HttpStatus.NOT_FOUND).build();
     }
+
+    @GetMapping("/postsUsuariosSeguidos")
+    public ResponseEntity<List<RespostaPostDto>> postsUsuariosSeguidos (@RequestHeader("Authorization") String authorizationHeader) {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPostDto> posts = postService.postsUsuariosSeguidos(usuario);
+
+        if (posts != null) {
+            if (!posts.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.OK).body(posts);
+            }
+            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        }
+        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
 }
