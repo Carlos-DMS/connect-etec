@@ -347,7 +347,7 @@ public class PerfilUsuarioService {
                         selecionarNomeExibido(usuario),
                         perfilUsuario.get().getUrlFotoPerfil(),
                         usuario.getLogin(),
-                        perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuario.getLogin())
+                        !usuario.equals(usuarioLogado) ? perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuario.getLogin()) : null
                 ));
             }
         }
