@@ -324,6 +324,36 @@ public class PerfilUsuarioService {
         return null;
     }
 
+    public List<RespostaPerfilUsuarioDto> buscarUsuariosPorNome(
+            UsuarioModel usuarioLogado,
+            String nome)
+    {
+        List<RespostaPerfilUsuarioDto> perfisDTO = new ArrayList<>();
+
+        List<UsuarioModel> usuarios = usuarioRepository.findByNomeCompletoContaining(nome);
+        List<UsuarioModel> usuariosNomeSocial = usuarioRepository.findByNomeSocialContaining(nome);
+
+        for (UsuarioModel usuarioNomeSocial : usuariosNomeSocial) {
+            if (!usuarios.contains(usuarioNomeSocial)) {
+                usuarios.add(usuarioNomeSocial);
+            }
+        }
+
+        for (UsuarioModel usuario : usuarios) {
+            Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+            if (perfilUsuario.isPresent()) {
+                perfisDTO.add(new RespostaPerfilUsuarioDto(
+                        selecionarNomeExibido(usuario),
+                        perfilUsuario.get().getUrlFotoPerfil(),
+                        usuario.getLogin(),
+                        perfilSeguidoPeloUsuarioLogado(usuarioLogado, usuario.getLogin())
+                ));
+            }
+        }
+        return perfisDTO;
+    }
+
     public Optional<PerfilUsuarioModel> buscarPerfil(String loginUsuario) {
         UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
 

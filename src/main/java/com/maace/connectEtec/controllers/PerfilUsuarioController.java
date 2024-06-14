@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
+
 import java.util.List;
 import java.util.Optional;
 
@@ -24,11 +25,13 @@ public class PerfilUsuarioController {
     UsuarioService usuarioService;
 
     @PatchMapping("/editarDados")
-    public ResponseEntity editarDados(@RequestHeader("Authorization") String authorizationHeader,
-                                      @RequestBody @Valid EditarPerfilUsuarioDto editarPerfilDto) {
+    public ResponseEntity editarDados(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid EditarPerfilUsuarioDto editarPerfilDto)
+    {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        if(usuario != null) {
+        if (usuario != null) {
             perfilUsuarioService.editarDadosPerfil(editarPerfilDto, usuario);
             return ResponseEntity.status(HttpStatus.OK).build();
         }
@@ -36,11 +39,13 @@ public class PerfilUsuarioController {
     }
 
     @PatchMapping("/editarFotoPerfil")
-    public ResponseEntity editarFotoPerfil(@RequestHeader("Authorization") String authorizationHeader,
-                                           @RequestBody @Valid EditarFotoPerfilDto editarFotoPerfilDto) {
+    public ResponseEntity editarFotoPerfil(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid EditarFotoPerfilDto editarFotoPerfilDto)
+    {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        if(usuario != null) {
+        if (usuario != null) {
             perfilUsuarioService.editarFotoPerfil(editarFotoPerfilDto, usuario);
             return ResponseEntity.status(HttpStatus.OK).build();
         }
@@ -113,7 +118,7 @@ public class PerfilUsuarioController {
     }
 
     @PatchMapping("/seguir")
-    public ResponseEntity<Boolean> seguirUsuario (
+    public ResponseEntity<Boolean> seguirUsuario(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestBody @Valid SeguirUsuarioDto seguirUsuarioDto)
     {
@@ -132,7 +137,7 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/meusUsuariosSeguidos")
-    public ResponseEntity<List<RespostaPerfilUsuarioDto>> meusUsuariosSeguidos (@RequestHeader("Authorization") String authorizationHeader) {
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> meusUsuariosSeguidos(@RequestHeader("Authorization") String authorizationHeader) {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         List<RespostaPerfilUsuarioDto> usuariosSeguidos = perfilUsuarioService.listarUsuariosSeguidos(usuario);
@@ -147,7 +152,7 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/usuariosSeguidos")
-    public ResponseEntity<List<RespostaPerfilUsuarioDto>> usuariosSeguidos (
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> usuariosSeguidos(
             @RequestHeader("Authorization") String authorizationHeader,
             @RequestParam(name = "loginUsuario", required = true) String loginUsuario)
     {
@@ -201,5 +206,20 @@ public class PerfilUsuarioController {
             return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+    }
+
+    @GetMapping("/buscarPorNome")
+    public ResponseEntity<List<RespostaPerfilUsuarioDto>> buscarPorNome(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "nome", required = true) String nome)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPerfilUsuarioDto> perfis = perfilUsuarioService.buscarUsuariosPorNome(usuario, nome);
+
+        if (!perfis.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(perfis);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }

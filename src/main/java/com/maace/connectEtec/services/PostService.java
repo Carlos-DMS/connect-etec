@@ -211,7 +211,6 @@ public class PostService {
                 ));
             }
         }
-
         return postsDTO;
     }
 

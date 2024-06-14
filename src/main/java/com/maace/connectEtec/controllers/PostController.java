@@ -93,12 +93,9 @@ public class PostController {
 
         List<RespostaPostDto> posts = postService.postsUsuariosSeguidos(usuario);
 
-        if (posts != null) {
-            if (!posts.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.OK).body(posts);
-            }
-            return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+        if (!posts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(posts);
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
 }
