@@ -98,4 +98,19 @@ public class PostController {
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }
+
+    @GetMapping("/buscarPorTag")
+    public ResponseEntity<List<RespostaPostDto>> buscarPorTag (
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "tag", required = true) String tag)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        List<RespostaPostDto> posts = postService.buscarPorTag(usuario, tag);
+
+        if (!posts.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.OK).body(posts);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 }

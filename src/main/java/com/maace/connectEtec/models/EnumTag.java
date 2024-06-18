@@ -6,7 +6,6 @@ public enum EnumTag {
     CONTABILIDADE("Contabilidade"),
     SEGURANCA_DO_TRABALHO("Segurança do trabalho"),
     NOTICIA("Notícia"),
-    EVENTO("Evento"),
     OUTRO("Outro");
 
     private final String tag;

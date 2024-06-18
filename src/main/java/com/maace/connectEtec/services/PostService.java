@@ -216,6 +216,47 @@ public class PostService {
         return postsDTO;
     }
 
+    public List<RespostaPostDto> buscarPorTag (UsuarioModel usuario, String tag) {
+        List<RespostaPostDto> postsDTO = new ArrayList<>();
+
+        List<PostModel> postsModel = postRepository.findByTag(EnumTag.valueOf(tag));
+
+        postsModel.sort(Comparator.comparing(PostModel::getMomentoPublicacao).reversed());
+
+        for (PostModel post : postsModel) {
+            Optional<GrupoModel> grupo = Optional.empty();
+            Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
+
+            UsuarioModel autor = usuarioRepository.findByLogin(post.getLoginAutor());
+            Optional<PerfilUsuarioModel> perfilAutor = perfilUsuarioRepository.findById(autor.getIdPerfilUsuario());
+
+            if (post.getIdGrupo() != null) {
+                grupo = grupoRepository.findById(post.getIdGrupo());
+                if (grupo.isPresent()) {
+                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                }
+            }
+
+            postsDTO.add(new RespostaPostDto(
+                    post.getIdPost(),
+                    perfilUsuarioService.selecionarNomeExibido(autor),
+                    perfilAutor.get().getUrlFotoPerfil(),
+                    grupo.isPresent() ? grupo.get().getNome() : null,
+                    perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                    post.getUrlMidia(),
+                    post.getConteudo(),
+                    post.momentoFormatado(),
+                    post.getLoginAutor(),
+                    post.getQtdLike(),
+                    post.getQtdComentarios(),
+                    postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                    post.getTagRelatorio(),
+                    autor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+            ));
+        }
+        return postsDTO;
+    }
+
     public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
         UsuarioModel usuario = usuarioRepository.findByLogin(login);
         Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
