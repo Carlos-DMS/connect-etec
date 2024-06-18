@@ -5,5 +5,8 @@ public record AcessarPerfilUsuarioDto(
         String nomeSocial,
         String nomeUsuario,
         String urlFotoPerfil,
-        String sobre
+        String sobre,
+        Integer qtdUsuariosSeguidos,
+        Integer qtdSeguidores,
+        Boolean estaSeguido
 ) {}

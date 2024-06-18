@@ -93,7 +93,8 @@ public class PostService {
                     post.getQtdLike(),
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
-                    post.getTagRelatorio()
+                    post.getTagRelatorio(),
+                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
             )));
         }
         return postsDto;
@@ -207,7 +208,8 @@ public class PostService {
                         post.getQtdLike(),
                         post.getQtdComentarios(),
                         postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
-                        post.getTagRelatorio()
+                        post.getTagRelatorio(),
+                        usuarioSeguido.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
                 ));
             }
         }

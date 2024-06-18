@@ -81,8 +81,12 @@ public class PerfilUsuarioController {
     }
 
     @GetMapping("/buscarPerfil")
-    public ResponseEntity<AcessarPerfilUsuarioDto> buscarPerfil(@RequestParam(name = "loginUsuario", required = true) String loginUsuario) {
-        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(loginUsuario);
+    public ResponseEntity<AcessarPerfilUsuarioDto> buscarPerfil(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestParam(name = "loginUsuario", required = true) String loginUsuario)
+    {
+        UsuarioModel usuarioLogado = usuarioService.buscarPorToken(authorizationHeader);
+        AcessarPerfilUsuarioDto acessarPerfilUsuarioDto = perfilUsuarioService.acessarPerfilUsuario(usuarioLogado, loginUsuario);
 
         if (acessarPerfilUsuarioDto != null) {
             return ResponseEntity.status(HttpStatus.OK).body(acessarPerfilUsuarioDto);

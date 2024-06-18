@@ -89,7 +89,33 @@ public class PerfilUsuarioService {
                     usuario.getNomeSocial(),
                     selecionarNomeExibido(usuario),
                     perfil.get().getUrlFotoPerfil(),
-                    perfil.get().getSobre()
+                    perfil.get().getSobre(),
+                    perfil.get().getQtdUsuariosSeguidos(),
+                    perfil.get().getQtdSeguidores(),
+                    null
+            );
+        }
+        return null;
+    }
+
+    //Sobrecarga para /perfilUsuario/buscarPerfil
+    public AcessarPerfilUsuarioDto acessarPerfilUsuario(
+            UsuarioModel usuarioLogado,
+            String loginUsuario)
+    {
+        UsuarioModel usuario = usuarioRepository.findByLogin(loginUsuario);
+        Optional<PerfilUsuarioModel> perfil = buscarPerfil(loginUsuario);
+
+        if (usuario != null) {
+            return new AcessarPerfilUsuarioDto(
+                    usuario.getNomeCompleto(),
+                    usuario.getNomeSocial(),
+                    selecionarNomeExibido(usuario),
+                    perfil.get().getUrlFotoPerfil(),
+                    perfil.get().getSobre(),
+                    perfil.get().getQtdUsuariosSeguidos(),
+                    perfil.get().getQtdSeguidores(),
+                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, loginUsuario)
             );
         }
         return null;
@@ -109,7 +135,7 @@ public class PerfilUsuarioService {
             Optional<PostModel> post = postRepository.findById(idPost);
 
             if (post.isPresent()) {
-                UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+                UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.get().getLoginAutor());
 
                 if (post.get().getIdGrupo() != null) {
                     grupo = grupoRepository.findById(post.get().getIdGrupo());
@@ -118,18 +144,19 @@ public class PerfilUsuarioService {
 
                 posts.add(Optional.of(new RespostaPostDto(
                         post.get().getIdPost(),
-                        selecionarNomeExibido(usuario),
+                        selecionarNomeExibido(usuarioAutor),
                         perfilUsuario.get().getUrlFotoPerfil(),
                         (grupo.isPresent()) ? grupo.get().getNome() : null,
                         (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
                         post.get().getUrlMidia(),
                         post.get().getConteudo(),
                         post.get().momentoFormatado(),
-                        usuario.getLogin(),
+                        usuarioAutor.getLogin(),
                         post.get().getQtdLike(),
                         post.get().getQtdComentarios(),
                         postCurtidoPeloUsuario(login, post.get().getIdPost()),
-                        post.get().getTagRelatorio()
+                        post.get().getTagRelatorio(),
+                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
                 )));
             }
         }
@@ -153,7 +180,7 @@ public class PerfilUsuarioService {
             Optional<PostModel> post = postRepository.findById(idPost);
 
             if (post.isPresent()) {
-                UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+                UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.get().getLoginAutor());
 
                 if (post.get().getIdGrupo() != null) {
                     grupo = grupoRepository.findById(post.get().getIdGrupo());
@@ -162,18 +189,19 @@ public class PerfilUsuarioService {
 
                 posts.add(Optional.of(new RespostaPostDto(
                         post.get().getIdPost(),
-                        selecionarNomeExibido(usuario),
+                        selecionarNomeExibido(usuarioAutor),
                         perfilUsuario.get().getUrlFotoPerfil(),
                         (grupo.isPresent()) ? grupo.get().getNome() : null,
                         (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
                         post.get().getUrlMidia(),
                         post.get().getConteudo(),
                         post.get().momentoFormatado(),
-                        usuario.getLogin(),
+                        usuarioAutor.getLogin(),
                         post.get().getQtdLike(),
                         post.get().getQtdComentarios(),
                         postCurtidoPeloUsuario(loginUsuario, post.get().getIdPost()),
-                        post.get().getTagRelatorio()
+                        post.get().getTagRelatorio(),
+                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
                 )));
             }
         }

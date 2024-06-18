@@ -84,9 +84,9 @@ public class GrupoController {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
         if(usuario != null){
-            boolean tonarMorderador = grupoService.tornarModerador(usuario.getLogin(), idGrupo);
+            boolean tornarMorderador = grupoService.tornarModerador(usuario.getLogin(), idGrupo);
 
-            if(tonarMorderador){
+            if(tornarMorderador){
                 return ResponseEntity.status(HttpStatus.OK).build();
             }
         }

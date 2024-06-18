@@ -118,23 +118,24 @@ public class PerfilGrupoService {
                 Optional<PostModel> post = postRepository.findById(idPost);
 
                 if (post.isPresent()) {
-                    Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioService.buscarPerfil(post.get().getLoginAutor());
-                    UsuarioModel usuario = usuarioRepository.findByLogin(post.get().getLoginAutor());
+                    UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.get().getLoginAutor());
+                    Optional<PerfilUsuarioModel> perfilUsuarioAutor = perfilUsuarioService.buscarPerfil(post.get().getLoginAutor());
 
                     posts.add(Optional.of(new RespostaPostDto(
                             post.get().getIdPost(),
-                            perfilUsuarioService.selecionarNomeExibido(usuario),
-                            perfilUsuario.get().getUrlFotoPerfil(),
+                            perfilUsuarioService.selecionarNomeExibido(usuarioAutor),
+                            perfilUsuarioAutor.get().getUrlFotoPerfil(),
                             grupo.get().getNome(),
                             perfil.getUrlFotoPerfil(),
                             post.get().getUrlMidia(),
                             post.get().getConteudo(),
                             post.get().momentoFormatado(),
-                            usuario.getLogin(),
+                            usuarioAutor.getLogin(),
                             post.get().getQtdLike(),
                             post.get().getQtdComentarios(),
                             postCurtidoPeloUsuario(login, post.get().getIdPost()),
-                            post.get().getTagRelatorio()
+                            post.get().getTagRelatorio(),
+                            usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
                     )));
                 }
             }

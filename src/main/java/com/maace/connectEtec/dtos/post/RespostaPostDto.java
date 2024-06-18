@@ -15,5 +15,6 @@ public record RespostaPostDto(
         Integer qtdLike,
         Integer qtdComentarios,
         Boolean postCurtido,
-        String tag
+        String tag,
+        Boolean usuarioADM
 ) { }
