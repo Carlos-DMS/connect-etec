@@ -33,7 +33,7 @@ public class ComentarioModel implements Serializable {
 
     public String momentoFormatado() {
         DateTimeFormatter formato = DateTimeFormatter.ofPattern("dd/MM/yyyy - HH:mm");
-        return momentoPublicacao.format(formato);
+        return momentoPublicacao.minusHours(3).format(formato);
     }
 
     public String getLoginAutor() {
