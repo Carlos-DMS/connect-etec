@@ -127,12 +127,12 @@ public class UsuarioService implements UserDetailsService {
             UsuarioModel usuarioADM = usuarioRepository.findByLogin(loginADM);
 
             if (!usuarioADM.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)) {
-                usuarioADM.setTipoUsuario(EnumTipoUsuario.ADMINISTRADOR);
+                usuarioADM.setTipoUsuario("ADMINISTRADOR");
                 usuarioRepository.save(usuarioADM);
 
                 return true;
             }
-            usuarioADM.setTipoUsuario(EnumTipoUsuario.USUARIO);
+            usuarioADM.setTipoUsuario("USUARIO");
             usuarioRepository.save(usuarioADM);
 
             return false;
