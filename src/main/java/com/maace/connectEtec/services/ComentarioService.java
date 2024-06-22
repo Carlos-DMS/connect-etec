@@ -68,6 +68,7 @@ public class ComentarioService {
                     if (perfilAutor.isPresent()) {
                         comentarios.add(new RespostaComentarioDto(
                                 comentario.get().getIdComentario(),
+                                comentario.get().getLoginAutor(),
                                 perfilUsuarioService.selecionarNomeExibido(autor),
                                 perfilAutor.get().getUrlFotoPerfil(),
                                 comentario.get().getUrlMidia(),

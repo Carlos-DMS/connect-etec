@@ -1,6 +1,7 @@
 package com.maace.connectEtec.services;
 
 import com.maace.connectEtec.dtos.usuario.CadastroUsuarioDto;
+import com.maace.connectEtec.models.EnumTipoUsuario;
 import com.maace.connectEtec.models.PerfilUsuarioModel;
 import com.maace.connectEtec.models.RequestValidacaoModel;
 import com.maace.connectEtec.models.UsuarioModel;
@@ -119,6 +120,20 @@ public class UsuarioService implements UserDetailsService {
             return true;
         }
         return false;
+    }
+
+    public Boolean alterarTipoUsuario (UsuarioModel usuarioLogado, String loginADM) {
+        if (usuarioLogado.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)) {
+            UsuarioModel usuarioADM = usuarioRepository.findByLogin(loginADM);
+
+            if (!usuarioADM.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)) {
+                usuarioADM.setTipoUsuario(EnumTipoUsuario.ADMINISTRADOR);
+                return true;
+            }
+            usuarioADM.setTipoUsuario(EnumTipoUsuario.USUARIO);
+            return false;
+        }
+        return null;
     }
 
     public boolean validacaoDeRequest(UUID idRequest, Integer codigoDeValidacao) {

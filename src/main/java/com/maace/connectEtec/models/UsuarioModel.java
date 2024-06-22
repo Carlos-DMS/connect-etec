@@ -75,8 +75,8 @@ public class UsuarioModel implements Serializable, UserDetails {
         return tipoUsuario;
     }
 
-    public void setTipoUsuario(String tipoUsuario) {
-        this.tipoUsuario = EnumTipoUsuario.valueOf(tipoUsuario);
+    public void setTipoUsuario(EnumTipoUsuario tipoUsuario) {
+        this.tipoUsuario = tipoUsuario;
     }
 
     @Override

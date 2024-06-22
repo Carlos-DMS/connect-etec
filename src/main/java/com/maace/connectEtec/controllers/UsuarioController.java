@@ -112,4 +112,22 @@ public class UsuarioController {
         }
         return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
     }
+
+    @PatchMapping("/alterarTipoUsuario")
+    public ResponseEntity<Boolean> alterarTipoUsuario (
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid LoginRequestDto loginDTO)
+    {
+        UsuarioModel usuarioLogado = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean resultado = usuarioService.alterarTipoUsuario(
+                usuarioLogado,
+                loginDTO.login()
+        );
+
+        if (resultado != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(resultado);
+        }
+        return ResponseEntity.status(HttpStatus.METHOD_NOT_ALLOWED).build();
+    }
 }

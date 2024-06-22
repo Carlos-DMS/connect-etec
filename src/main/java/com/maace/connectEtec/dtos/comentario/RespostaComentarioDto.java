@@ -4,6 +4,7 @@ import java.util.UUID;
 
 public record RespostaComentarioDto(
         UUID idComentario,
+        String loginAutor,
         String nomeAutor,
         String urlFotoPerfilUsuario,
         String urlMidia,
