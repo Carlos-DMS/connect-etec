@@ -8,5 +8,6 @@ public record AcessarPerfilUsuarioDto(
         String sobre,
         Integer qtdUsuariosSeguidos,
         Integer qtdSeguidores,
-        Boolean estaSeguido
+        Boolean estaSeguido,
+        Boolean usuarioADM
 ) {}

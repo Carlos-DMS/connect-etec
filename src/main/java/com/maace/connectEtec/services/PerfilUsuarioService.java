@@ -92,7 +92,8 @@ public class PerfilUsuarioService {
                     perfil.get().getSobre(),
                     perfil.get().getQtdUsuariosSeguidos(),
                     perfil.get().getQtdSeguidores(),
-                    null
+                    null,
+                    usuario.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
             );
         }
         return null;
@@ -115,7 +116,8 @@ public class PerfilUsuarioService {
                     perfil.get().getSobre(),
                     perfil.get().getQtdUsuariosSeguidos(),
                     perfil.get().getQtdSeguidores(),
-                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, loginUsuario)
+                    perfilSeguidoPeloUsuarioLogado(usuarioLogado, loginUsuario),
+                    usuario.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
             );
         }
         return null;
