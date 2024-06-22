@@ -369,6 +369,8 @@ public class PerfilUsuarioService {
             }
         }
 
+        usuarios.sort(Comparator.comparing(UsuarioModel::getNomeCompleto, String.CASE_INSENSITIVE_ORDER));
+
         for (UsuarioModel usuario : usuarios) {
             Optional<PerfilUsuarioModel> perfilUsuario = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
 
