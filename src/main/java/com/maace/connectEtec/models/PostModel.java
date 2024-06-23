@@ -24,6 +24,8 @@ public class PostModel implements Serializable {
     private String conteudo;
     private Integer qtdLike = 0;
     private EnumTag tag;
+    private Integer qtdDenuncia = 0;
+
     @ElementCollection
     @CollectionTable(name = "tb_post_comentarios", joinColumns = @JoinColumn(name = "post_id"))
     @Column(name = "comentario_id")
@@ -65,6 +67,14 @@ public class PostModel implements Serializable {
 
     public void setConteudo(String conteudo) {
         this.conteudo = conteudo;
+    }
+
+    public Integer getQtdDenuncia() {
+        return qtdDenuncia;
+    }
+
+    public void setQtdDenuncia() {
+        this.qtdDenuncia += 1;
     }
 
     public Integer getQtdLike() {

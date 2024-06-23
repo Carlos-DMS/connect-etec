@@ -158,7 +158,8 @@ public class PerfilUsuarioService {
                         post.get().getQtdComentarios(),
                         postCurtidoPeloUsuario(login, post.get().getIdPost()),
                         post.get().getTagRelatorio(),
-                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                        post.get().getQtdDenuncia()
                 )));
             }
         }
@@ -203,7 +204,8 @@ public class PerfilUsuarioService {
                         post.get().getQtdComentarios(),
                         postCurtidoPeloUsuario(loginUsuario, post.get().getIdPost()),
                         post.get().getTagRelatorio(),
-                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                        post.get().getQtdDenuncia()
                 )));
             }
         }

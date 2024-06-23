@@ -3,6 +3,7 @@ package com.maace.connectEtec.controllers;
 
 import com.maace.connectEtec.dtos.post.CriarPostDto;
 import com.maace.connectEtec.dtos.post.CurtirPostDto;
+import com.maace.connectEtec.dtos.post.DenunciarPostDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.UsuarioModel;
 import com.maace.connectEtec.services.PostService;
@@ -64,6 +65,21 @@ public class PostController {
 
         if (estadoLike != null) {
             return ResponseEntity.status(HttpStatus.OK).body(estadoLike);
+        }
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
+
+    @PatchMapping("/denunciar")
+    public ResponseEntity<Boolean> denunciarPost(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid DenunciarPostDto denunciarPostDto)
+    {
+        UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
+
+        Boolean estadoDenuncia = postService.denunciar(usuario.getLogin(), UUID.fromString(denunciarPostDto.idPost()), denunciarPostDto.estaDenunciado());
+
+        if (estadoDenuncia != null) {
+            return ResponseEntity.status(HttpStatus.OK).body(estadoDenuncia);
         }
         return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
     }

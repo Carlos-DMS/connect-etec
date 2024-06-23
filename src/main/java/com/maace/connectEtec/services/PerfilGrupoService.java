@@ -135,7 +135,8 @@ public class PerfilGrupoService {
                             post.get().getQtdComentarios(),
                             postCurtidoPeloUsuario(login, post.get().getIdPost()),
                             post.get().getTagRelatorio(),
-                            usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                            usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                            post.get().getQtdDenuncia()
                     )));
                 }
             }

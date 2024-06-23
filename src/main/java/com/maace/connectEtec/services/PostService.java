@@ -94,7 +94,8 @@ public class PostService {
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio(),
-                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                    post.getQtdDenuncia()
             )));
         }
         return postsDto;
@@ -109,6 +110,34 @@ public class PostService {
         if (post.isPresent() && perfil.isPresent()) {
             if (!estaCurtido) {
                 post.get().curtir();
+                perfil.get().curtirPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return true;
+            } else {
+                post.get().removerCurtida();
+                perfil.get().removerCurtidaPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return false;
+            }
+        }
+        return null;
+    }
+
+    public Boolean denunciar(String login, UUID idPost, boolean estaDenunciado) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        Optional<PostModel> post = postRepository.findById(idPost);
+
+        if (post.isPresent() && perfil.isPresent()) {
+            if (!estaDenunciado) {
+                post.get().setQtdDenuncia();
                 perfil.get().curtirPost(idPost);
 
                 postRepository.save(post.get());
@@ -209,7 +238,8 @@ public class PostService {
                         post.getQtdComentarios(),
                         postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                         post.getTagRelatorio(),
-                        usuarioSeguido.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                        usuarioSeguido.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                        post.getQtdDenuncia()
                 ));
             }
         }
@@ -251,7 +281,8 @@ public class PostService {
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio(),
-                    autor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                    autor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                    post.getQtdDenuncia()
             ));
         }
         return postsDTO;
