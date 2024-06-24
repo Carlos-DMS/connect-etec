@@ -357,10 +357,9 @@ public class PostService {
                         postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                         post.getBlockDenuncia()
                 ));
-                return postsDTO;
             }
         }
-        return null;
+        return postsDTO;
     }
 
     public Boolean postCurtidoPeloUsuario(String login, UUID idPost) {
