@@ -1,6 +1,7 @@
 package com.maace.connectEtec.services;
 
 import com.maace.connectEtec.dtos.post.CriarPostDto;
+import com.maace.connectEtec.dtos.post.RespostaDenunciasPostDto;
 import com.maace.connectEtec.dtos.post.RespostaPostDto;
 import com.maace.connectEtec.models.*;
 import com.maace.connectEtec.repositories.*;
@@ -80,7 +81,8 @@ public class PostService {
                 }
             }
 
-            postsDto.add(Optional.of(new RespostaPostDto(
+            if(post.getQtdDenuncia() < 10 && post.getBlockDenuncia() != 1){
+                postsDto.add(Optional.of(new RespostaPostDto(
                     post.getIdPost(),
                     perfilUsuarioService.selecionarNomeExibido(usuarioAutor),
                     perfilUsuarioAutor.get().getUrlFotoPerfil(),
@@ -94,8 +96,56 @@ public class PostService {
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio(),
-                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
-            )));
+                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                    postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                    post.getBlockDenuncia()
+                )));
+            }
+        }
+        return postsDto;
+    }
+
+    public List<Optional<RespostaDenunciasPostDto>> listarPostsComDenuncia(UsuarioModel usuario) {
+
+        List<PostModel> posts = postRepository.findAll();
+        List<Optional<RespostaDenunciasPostDto>> postsDto = new ArrayList<>();
+
+        posts.sort(Comparator.comparing(PostModel::getMomentoPublicacao).reversed());
+
+        for (PostModel post : posts) {
+            Optional<GrupoModel> grupo = Optional.empty();
+            Optional<PerfilGrupoModel> perfilGrupo = Optional.empty();
+
+            UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.getLoginAutor());
+            Optional<PerfilUsuarioModel> perfilUsuarioAutor = perfilUsuarioRepository.findById(usuarioAutor.getIdPerfilUsuario());
+
+            if (post.getIdGrupo() != null) {
+                grupo = grupoRepository.findById(post.getIdGrupo());
+                if (grupo.isPresent()) {
+                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                }
+            }
+
+            if(post.getQtdDenuncia() >= 10 && post.getBlockDenuncia() == 0){
+                postsDto.add(Optional.of(new RespostaDenunciasPostDto(
+                    post.getIdPost(),
+                    perfilUsuarioService.selecionarNomeExibido(usuarioAutor),
+                    perfilUsuarioAutor.get().getUrlFotoPerfil(),
+                    grupo.isPresent() ? grupo.get().getNome() : null,
+                    perfilGrupo.isPresent() ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                    post.getUrlMidia(),
+                    post.getConteudo(),
+                    post.momentoFormatado(),
+                    post.getLoginAutor(),
+                    post.getQtdLike(),
+                    post.getQtdComentarios(),
+                    postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                    post.getTagRelatorio(),
+                    usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                    postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                    post.getQtdDenuncia()
+                )));
+            }
         }
         return postsDto;
     }
@@ -122,6 +172,55 @@ public class PostService {
                 postRepository.save(post.get());
                 perfilUsuarioRepository.save(perfil.get());
 
+                return false;
+            }
+        }
+        return null;
+    }
+
+    public Boolean denunciar(String login, UUID idPost, boolean estaDenunciado) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        Optional<PostModel> post = postRepository.findById(idPost);
+
+        if (post.isPresent() && perfil.isPresent()) {
+            if (!estaDenunciado) {
+                post.get().addDenuncia();
+                perfil.get().denunciarPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return true;
+            } else {
+                post.get().removerDenuncia();
+                perfil.get().removerDenunciaPost(idPost);
+
+                postRepository.save(post.get());
+                perfilUsuarioRepository.save(perfil.get());
+
+                return false;
+            }
+        }
+        return null;
+    }
+
+    public Boolean gerenciarBlock(UUID idPost, Integer block) {
+        Optional<PostModel> post = postRepository.findById(idPost);
+
+        if (post.isPresent()) {
+            if (block == 1) {
+                post.get().bloquearDenuncia();
+
+                postRepository.save(post.get());
+                return true;
+            } else if (block == 2) {
+                post.get().desbloquearDenuncia();
+
+                postRepository.save(post.get());
+                return true;
+            } else {
                 return false;
             }
         }
@@ -209,7 +308,9 @@ public class PostService {
                         post.getQtdComentarios(),
                         postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                         post.getTagRelatorio(),
-                        usuarioSeguido.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                        usuarioSeguido.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                        postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                        post.getBlockDenuncia()
                 ));
             }
         }
@@ -251,7 +352,9 @@ public class PostService {
                     post.getQtdComentarios(),
                     postCurtidoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                     post.getTagRelatorio(),
-                    autor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR)
+                    autor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                    postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
+                    post.getBlockDenuncia()
             ));
         }
         return postsDTO;
@@ -263,6 +366,16 @@ public class PostService {
 
         if (perfil.isPresent()) {
             return perfil.get().getIdPostsCurtidos().contains(idPost);
+        }
+        return null;
+    }
+
+    public Boolean postDenunciadoPeloUsuario(String login, UUID idPost) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        if (perfil.isPresent()) {
+            return perfil.get().getIdPostsDenunciados().contains(idPost);
         }
         return null;
     }
