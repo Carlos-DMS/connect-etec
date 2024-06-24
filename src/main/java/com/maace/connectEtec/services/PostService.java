@@ -357,8 +357,8 @@ public class PostService {
                         postDenunciadoPeloUsuario(usuario.getLogin(), post.getIdPost()),
                         post.getBlockDenuncia()
                 ));
+                return postsDTO;
             }
-            return postsDTO;
         }
         return null;
     }
