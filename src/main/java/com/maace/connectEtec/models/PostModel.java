@@ -25,6 +25,7 @@ public class PostModel implements Serializable {
     private Integer qtdLike = 0;
     private EnumTag tag;
     private Integer qtdDenuncia = 0;
+    private Integer blockDenuncia = 0;
 
     @ElementCollection
     @CollectionTable(name = "tb_post_comentarios", joinColumns = @JoinColumn(name = "post_id"))
@@ -73,9 +74,24 @@ public class PostModel implements Serializable {
         return qtdDenuncia;
     }
 
-    public void setQtdDenuncia() {
+    public void addDenuncia() {
         this.qtdDenuncia += 1;
     }
+
+    public void removerDenuncia() {
+        this.qtdDenuncia -= 1;
+    }
+
+    public void bloquearDenuncia() {
+        this.blockDenuncia = 1;
+    }
+
+    public void desbloquearDenuncia() {
+        this.blockDenuncia = 2;
+        this.qtdDenuncia = 0;
+    }
+
+    public Integer getBlockDenuncia() { return this.blockDenuncia; }
 
     public Integer getQtdLike() {
         return qtdLike;

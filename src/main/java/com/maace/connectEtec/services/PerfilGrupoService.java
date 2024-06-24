@@ -136,7 +136,8 @@ public class PerfilGrupoService {
                             postCurtidoPeloUsuario(login, post.get().getIdPost()),
                             post.get().getTagRelatorio(),
                             usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
-                            post.get().getQtdDenuncia()
+                            postDenunciadoPeloUsuario(login, post.get().getIdPost()),
+                            post.get().getBlockDenuncia()
                     )));
                 }
             }
@@ -165,6 +166,16 @@ public class PerfilGrupoService {
 
         if (perfil.isPresent()) {
             return perfil.get().getIdPostsCurtidos().contains(idPost);
+        }
+        return null;
+    }
+
+    public Boolean postDenunciadoPeloUsuario(String login, UUID idPost) {
+        UsuarioModel usuario = usuarioRepository.findByLogin(login);
+        Optional<PerfilUsuarioModel> perfil = perfilUsuarioRepository.findById(usuario.getIdPerfilUsuario());
+
+        if (perfil.isPresent()) {
+            return perfil.get().getIdPostsDenunciados().contains(idPost);
         }
         return null;
     }

@@ -28,6 +28,10 @@ public class PerfilUsuarioModel implements Serializable {
     @Column(name = "post_curtido_id")
     private List<UUID> idPostsCurtidos = new ArrayList<>();
     @ElementCollection
+    @CollectionTable(name = "tb_perfil_usuario_posts_denunciados", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
+    @Column(name = "post_denunciados_id")
+    private List<UUID> idPostsDenunciados = new ArrayList<>();
+    @ElementCollection
     @CollectionTable(name = "tb_perfil_usuario_comentarios_curtidos", joinColumns = @JoinColumn(name = "perfil_usuario_id"))
     @Column(name = "comentario_curtido_id")
     private List<UUID> idComentariosCurtidos = new ArrayList<>();
@@ -73,8 +77,19 @@ public class PerfilUsuarioModel implements Serializable {
         return idPostsCurtidos;
     }
 
+    public List<UUID> getIdPostsDenunciados() {
+        return idPostsDenunciados;
+    }
+
     public void curtirPost(UUID idPost) {
         idPostsCurtidos.add(idPost);
+    }
+
+    public void denunciarPost(UUID idPost) {
+        idPostsDenunciados.add(idPost);
+    }
+    public void removerDenunciaPost(UUID idPost) {
+        idPostsDenunciados.remove(idPost);
     }
 
     public void removerCurtidaPost(UUID idPost) {

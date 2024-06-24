@@ -17,5 +17,6 @@ public record RespostaPostDto(
         Boolean postCurtido,
         String tag,
         Boolean usuarioADM,
-        Integer qtdDenuncia
+        Boolean postDenunciado,
+        Integer blockDenuncia
 ) { }
