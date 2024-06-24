@@ -184,31 +184,33 @@ public class PerfilUsuarioService {
             Optional<PostModel> post = postRepository.findById(idPost);
 
             if (post.isPresent()) {
-                UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.get().getLoginAutor());
+                if (post.get().getQtdDenuncia() < 5 && post.get().getBlockDenuncia() != 1) {
+                    UsuarioModel usuarioAutor = usuarioRepository.findByLogin(post.get().getLoginAutor());
 
-                if (post.get().getIdGrupo() != null) {
-                    grupo = grupoRepository.findById(post.get().getIdGrupo());
-                    perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                    if (post.get().getIdGrupo() != null) {
+                        grupo = grupoRepository.findById(post.get().getIdGrupo());
+                        perfilGrupo = perfilGrupoRepository.findById(grupo.get().getIdGrupo());
+                    }
+
+                    posts.add(Optional.of(new RespostaPostDto(
+                            post.get().getIdPost(),
+                            selecionarNomeExibido(usuarioAutor),
+                            perfilUsuario.get().getUrlFotoPerfil(),
+                            (grupo.isPresent()) ? grupo.get().getNome() : null,
+                            (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
+                            post.get().getUrlMidia(),
+                            post.get().getConteudo(),
+                            post.get().momentoFormatado(),
+                            usuarioAutor.getLogin(),
+                            post.get().getQtdLike(),
+                            post.get().getQtdComentarios(),
+                            postCurtidoPeloUsuario(loginUsuario, post.get().getIdPost()),
+                            post.get().getTagRelatorio(),
+                            usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
+                            postDenunciadoPeloUsuario(loginUsuario, post.get().getIdPost()),
+                            post.get().getBlockDenuncia()
+                    )));
                 }
-
-                posts.add(Optional.of(new RespostaPostDto(
-                        post.get().getIdPost(),
-                        selecionarNomeExibido(usuarioAutor),
-                        perfilUsuario.get().getUrlFotoPerfil(),
-                        (grupo.isPresent()) ? grupo.get().getNome() : null,
-                        (perfilGrupo.isPresent()) ? perfilGrupo.get().getUrlFotoPerfil() : null,
-                        post.get().getUrlMidia(),
-                        post.get().getConteudo(),
-                        post.get().momentoFormatado(),
-                        usuarioAutor.getLogin(),
-                        post.get().getQtdLike(),
-                        post.get().getQtdComentarios(),
-                        postCurtidoPeloUsuario(loginUsuario, post.get().getIdPost()),
-                        post.get().getTagRelatorio(),
-                        usuarioAutor.getTipoUsuario().equals(EnumTipoUsuario.ADMINISTRADOR),
-                        postDenunciadoPeloUsuario(loginUsuario, post.get().getIdPost()),
-                        post.get().getBlockDenuncia()
-                )));
             }
         }
         Collections.reverse(posts);

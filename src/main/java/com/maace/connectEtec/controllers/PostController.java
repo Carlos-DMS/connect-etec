@@ -30,18 +30,18 @@ public class PostController {
     private PerfilUsuarioRepository perfilUsuarioRepository;
 
     @PostMapping
-    public ResponseEntity criar(@RequestHeader("Authorization") String authorizationHeader, @RequestBody @Valid CriarPostDto criarPostDto) {
+    public ResponseEntity criar(
+            @RequestHeader("Authorization") String authorizationHeader,
+            @RequestBody @Valid CriarPostDto criarPostDto)
+    {
         UsuarioModel usuario = usuarioService.buscarPorToken(authorizationHeader);
 
-        if (usuario != null) {
-            Boolean resultado = postService.criar(criarPostDto, usuario);
+        Boolean resultado = postService.criar(criarPostDto, usuario);
 
-            if (resultado) {
-                return ResponseEntity.status(HttpStatus.CREATED).build();
-            }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+        if (resultado) {
+            return ResponseEntity.status(HttpStatus.CREATED).build();
         }
-        return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
     }
 
     @GetMapping
