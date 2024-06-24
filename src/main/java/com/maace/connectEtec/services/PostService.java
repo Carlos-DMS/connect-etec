@@ -126,7 +126,7 @@ public class PostService {
                 }
             }
 
-            if (post.getQtdDenuncia() >= 10 && post.getBlockDenuncia() == 0) {
+            if (post.getQtdDenuncia() >= 5 && post.getBlockDenuncia() == 0) {
                 postsDto.add(Optional.of(new RespostaDenunciasPostDto(
                         post.getIdPost(),
                         perfilUsuarioService.selecionarNomeExibido(usuarioAutor),
